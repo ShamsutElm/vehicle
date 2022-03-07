@@ -7,6 +7,9 @@ import java.sql.SQLException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -43,6 +46,8 @@ public class Gui {
     private JPanel panelTable;
     private JPanel panelButton;
 
+    private JMenuBar menuBar;
+
     private JFrame frame;
 
     private Gui() {
@@ -68,6 +73,7 @@ public class Gui {
         createTable();
         createButtons();
         createPannels();
+        createMenu();
         createFrame();
     }
 
@@ -144,8 +150,39 @@ public class Gui {
         panelButton.add(btnDel);
     }
 
+    private void createMenu() {
+        var createOrOpenItime = new JMenuItem(IGuiConsts.CREATE_OR_OPEN);
+        var fileMenu = new JMenu(IGuiConsts.FILE);
+        fileMenu.add(createOrOpenItime);
+
+        var defaultItem = new JMenuItem(IGuiConsts.DEFAULT);
+        defaultItem.addActionListener(actionEvent -> JOptionPane.showMessageDialog(
+                frame, "HA-HA!!! Not right now", "Default style",
+                JOptionPane.INFORMATION_MESSAGE));
+        var systemItem = new JMenuItem(IGuiConsts.SYSTEM);
+        systemItem.addActionListener(actionEvent -> JOptionPane.showMessageDialog(
+                frame, "Are you kiding me? It's not fun.", "System style",
+                JOptionPane.INFORMATION_MESSAGE));
+        var styleMenu = new JMenu(IGuiConsts.STYLE);
+        styleMenu.add(defaultItem);
+        styleMenu.add(systemItem);
+
+        var aboutItem = new JMenuItem(IGuiConsts.ABOUT);
+        aboutItem.addActionListener(actionEvent -> JOptionPane.showMessageDialog(
+                frame, IGuiConsts.ABOUT_TEXT, IGuiConsts.ABOUT_TITLE,
+                JOptionPane.INFORMATION_MESSAGE));
+        var helpMenu = new JMenu(IGuiConsts.HELP);
+        helpMenu.add(aboutItem);
+
+        menuBar = new JMenuBar();
+        menuBar.add(fileMenu);
+        menuBar.add(styleMenu);
+        menuBar.add(helpMenu);
+    }
+
     private void createFrame() {
         frame = CustomJFrame.create();
+        frame.setJMenuBar(menuBar);
         frame.getContentPane().add(panelTable, BorderLayout.CENTER);
         frame.getContentPane().add(panelButton, BorderLayout.EAST);
         frame.setVisible(true);

@@ -24,4 +24,18 @@ public interface IGuiConsts {
     String HAS_CRADLE = "has cradle";
     String TRANSPORTS_PASSENGERS = "transports passengers";
     String TRANSPORTS_CARGO = "transports cargo";
+
+    // Menu names
+    String FILE = "File";
+    String CREATE_OR_OPEN = "Create/Open";
+    String STYLE = "Style";
+    String DEFAULT = "Default";
+    String SYSTEM = "System";
+    String HELP = "Help";
+    String ABOUT = "About";
+
+    // Some default messages and titles in menu
+    String ABOUT_TITLE = "About";
+    String ABOUT_TEXT = "Some think have to be here, but i'm not sure";
+
 }
