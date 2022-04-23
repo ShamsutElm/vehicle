@@ -11,8 +11,10 @@ import home.utils.Utils;
 // TODO make sigletone
 public class Settings {
 
+    public static String STYLE;
     public static String DB_FILE_PATH;
 
+    public static final String STYLE_SETTING_NAME = "style";
     public static final String DB_FILE_PATH_SETTING_NAME = "db_file_path";
 
     private static final String SETTINGS_FILE_NAME = "settings.properties";
@@ -43,6 +45,7 @@ public class Settings {
                     + SETTINGS_FILE_NAME);
         }
 
+        STYLE = SETTINGS.getProperty(STYLE_SETTING_NAME, Default.STYLE);
         DB_FILE_PATH = SETTINGS.getProperty(DB_FILE_PATH_SETTING_NAME, Default.DB_FILE_PATH);
     }
 
@@ -61,6 +64,7 @@ public class Settings {
 
     private static void fillWithDefaultSettings() throws IOException {
         try (var outputStream = new FileOutputStream(SETTINGS_FILE_NAME)) {
+            SETTINGS.setProperty(STYLE_SETTING_NAME, Default.STYLE);
             SETTINGS.setProperty(DB_FILE_PATH_SETTING_NAME, Default.DB_FILE_PATH);
             SETTINGS.store(outputStream, null);
         } catch (IOException e) {
@@ -69,6 +73,7 @@ public class Settings {
     }
 
     private final class Default {
+        private static final String STYLE = "default";
         private static final String DB_FILE_PATH = "";
     }
 }

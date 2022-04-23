@@ -8,8 +8,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Locale;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -19,6 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.table.AbstractTableModel;
 
@@ -85,10 +88,7 @@ public class Gui {
     }
 
     public void buildGui() {
-        // TODO make swich between color schemas(save result in property file)
-        // activateSystemColorSchema();
-
-        JFrame.setDefaultLookAndFeelDecorated(true);
+        setStyle(Settings.STYLE);
 
         createTable();
         createButtons();
@@ -97,16 +97,17 @@ public class Gui {
         createFrame();
     }
 
-    private void activateSystemColorSchema() {
+    private void setStyle(String style) {
         try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            UIManager.setLookAndFeel(style.equalsIgnoreCase(IGuiConsts.SYSTEM)
+                    ? UIManager.getSystemLookAndFeelClassName()
+                    : UIManager.getCrossPlatformLookAndFeelClassName());
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(frame,
+            Utils.logAndShowError(LOG, frame,
                     "Error while set the system color schema.\n"
                             + "Default color schema will be used.\n"
                             + e.getMessage(),
-                    "System color schema error",
-                    JOptionPane.ERROR_MESSAGE);
+                    "System color schema error", e);
         }
     }
 
@@ -180,14 +181,12 @@ public class Gui {
         var fileMenu = new JMenu(IGuiConsts.FILE);
         fileMenu.add(createOrOpenItime);
 
-        var defaultItem = new JMenuItem(IGuiConsts.DEFAULT);
-        defaultItem.addActionListener(actionEvent -> JOptionPane.showMessageDialog(
-                frame, "HA-HA!!! Not right now", "Default style",
-                JOptionPane.INFORMATION_MESSAGE));
-        var systemItem = new JMenuItem(IGuiConsts.SYSTEM);
-        systemItem.addActionListener(actionEvent -> JOptionPane.showMessageDialog(
-                frame, "Are you kiding me? It's not fun.", "System style",
-                JOptionPane.INFORMATION_MESSAGE));
+        var defaultItem = new JCheckBoxMenuItem(IGuiConsts.DEFAULT);
+        defaultItem.setSelected(Settings.STYLE.equalsIgnoreCase(IGuiConsts.DEFAULT));
+        var systemItem = new JCheckBoxMenuItem(IGuiConsts.SYSTEM);
+        systemItem.setSelected(Settings.STYLE.equalsIgnoreCase(IGuiConsts.SYSTEM));
+        defaultItem.addActionListener(actionEvent -> styleSelectAction(systemItem, defaultItem));
+        systemItem.addActionListener(actionEvent -> styleSelectAction(defaultItem, systemItem));
         var styleMenu = new JMenu(IGuiConsts.STYLE);
         styleMenu.add(defaultItem);
         styleMenu.add(systemItem);
@@ -203,6 +202,24 @@ public class Gui {
         menuBar.add(fileMenu);
         menuBar.add(styleMenu);
         menuBar.add(helpMenu);
+    }
+
+    private void styleSelectAction(JCheckBoxMenuItem item1, JCheckBoxMenuItem item2) {
+        try {
+            item1.setSelected(!item2.isSelected());
+
+            if (item1.isSelected()) {
+                Settings.writeSettings(Settings.STYLE_SETTING_NAME,
+                        item1.getText().toLowerCase(Locale.ROOT));
+            } else {
+                Settings.writeSettings(Settings.STYLE_SETTING_NAME,
+                        item2.getText().toLowerCase(Locale.ROOT));
+            }
+            setStyle(Settings.STYLE);
+            SwingUtilities.updateComponentTreeUI(frame);
+        } catch (Exception e) {
+            Utils.logAndShowError(LOG, frame, "Error while chose style", "Style error", e);
+        }
     }
 
     private void createFrame() {
