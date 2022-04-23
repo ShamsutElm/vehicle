@@ -1,12 +1,13 @@
 package home.db;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import home.Settings;
 
 public class Connector {
 
@@ -17,17 +18,11 @@ public class Connector {
 
     public static Connection getConnetion() throws SQLException {
         try {
-            String dbFileAbsolutePath = DbCreator.dbFileAbsolutePath();
             Class.forName(JDBC_DRIVER_SQLITE);
             return DriverManager.getConnection(
-                    String.format(CONNECTION_URL_SQLITE, dbFileAbsolutePath));
-        } catch (ClassNotFoundException | IOException e) {
-            String errorMsg = null;
-            if (e instanceof ClassNotFoundException) {
-                errorMsg = "Не найден JDBC драйвер";
-            } else if (e instanceof IOException) {
-                errorMsg = "Ошибка создания файла БД";
-            }
+                    String.format(CONNECTION_URL_SQLITE, Settings.DB_FILE_PATH));
+        } catch (ClassNotFoundException e) {
+            String errorMsg = "Не найден JDBC драйвер";
             LOG.error(errorMsg);
             SQLException ex = new SQLException(errorMsg);
             ex.addSuppressed(e);

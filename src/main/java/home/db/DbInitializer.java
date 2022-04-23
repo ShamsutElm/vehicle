@@ -1,8 +1,17 @@
 package home.db;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import home.Settings;
+
 public class DbInitializer {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DbInitializer.class);
 
     private static final String CREATE_TBL_QUERY = "CREATE TABLE if NOT EXISTS vehicle ("
             + " 'id' integer PRIMARY KEY AUTOINCREMENT,"
@@ -14,6 +23,18 @@ public class DbInitializer {
             + " 'has_trailer' integer,"
             + " 'has_cradle' integer,"
             + " 'date_time' integer);";
+
+    public static void createDBFileIfNotExists(File file) throws IOException {
+        try {
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            Settings.writeSettings(Settings.DB_FILE_PATH_SETTING_NAME, file.getAbsolutePath());
+        } catch (IOException e) {
+            LOG.error("Error while creating the DB file", e);
+            throw e;
+        }
+    }
 
     public static void createTableIfNotExists() throws SQLException {
         try (var connection = Connector.getConnetion();

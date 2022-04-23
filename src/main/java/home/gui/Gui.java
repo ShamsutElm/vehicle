@@ -1,12 +1,17 @@
 package home.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.sql.SQLException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -17,9 +22,15 @@ import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.table.AbstractTableModel;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import home.Settings;
 import home.Storage;
+import home.db.DbInitializer;
 import home.db.dao.DaoSQLite;
 import home.gui.components.CustomJButton;
+import home.gui.components.CustomJFileChooser;
 import home.gui.components.CustomJFrame;
 import home.gui.components.CustomJPanel;
 import home.gui.components.CustomJPanel.PanelType;
@@ -27,12 +38,17 @@ import home.gui.components.CustomJTable;
 import home.gui.components.dialog.DialogCar;
 import home.gui.components.dialog.DialogMoto;
 import home.gui.components.dialog.DialogTruck;
+import home.utils.Utils;
 
 public class Gui {
+
+    private static final Logger LOG = LoggerFactory.getLogger(Gui.class);
 
     private static final int CLICK_COUNT = 2;
 
     private static Gui instance;
+
+    private JLabel dbLabel;
 
     private JTable table;
     private AbstractTableModel tableModel;
@@ -64,6 +80,10 @@ public class Gui {
         tableModel.fireTableDataChanged();
     }
 
+    public void setDBLabel(String label) {
+        dbLabel.setText(label);
+    }
+
     public void buildGui() {
         // TODO make swich between color schemas(save result in property file)
         // activateSystemColorSchema();
@@ -91,6 +111,9 @@ public class Gui {
     }
 
     private void createTable() {
+        dbLabel = new JLabel(Settings.hasPathToDBFile() ? Settings.DB_FILE_PATH
+                : IGuiConsts.CHOOSE_DB_FILE);
+
         table = CustomJTable.create();
         table.addMouseListener(new MouseAdapter() {
             @Override
@@ -141,6 +164,7 @@ public class Gui {
 
     private void createPannels() {
         panelTable = CustomJPanel.create(PanelType.FRAME_TABLE_PANEL);
+        panelTable.add(dbLabel, BorderLayout.NORTH);
         panelTable.add(tableScrollPane, BorderLayout.CENTER);
 
         panelButton = CustomJPanel.create(PanelType.FRAME_BUTTON_PANEL);
@@ -152,6 +176,7 @@ public class Gui {
 
     private void createMenu() {
         var createOrOpenItime = new JMenuItem(IGuiConsts.CREATE_OR_OPEN);
+        createOrOpenItime.addActionListener(new CreateOrOpenActionListner(frame, dbLabel));
         var fileMenu = new JMenu(IGuiConsts.FILE);
         fileMenu.add(createOrOpenItime);
 
@@ -186,5 +211,36 @@ public class Gui {
         frame.getContentPane().add(panelTable, BorderLayout.CENTER);
         frame.getContentPane().add(panelButton, BorderLayout.EAST);
         frame.setVisible(true);
+    }
+
+    private static final class CreateOrOpenActionListner implements ActionListener {
+
+        private final Component parent;
+        private final JLabel dbLabel;
+
+        public CreateOrOpenActionListner(Component parent, JLabel dbLabel) {
+            this.parent = parent;
+            this.dbLabel = dbLabel;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent event) {
+            // TODO make it in thread
+            try {
+                CustomJFileChooser.create(parent).showCreateOrOpen();
+                DbInitializer.createTableIfNotExists();
+                Storage.getInstance().refresh(DaoSQLite.getInstance().readAll());
+                dbLabel.setText(Settings.DB_FILE_PATH);
+            } catch (IOException e) {
+                Utils.logAndShowError(LOG, parent, "Error while create/open DB file.",
+                        "Create/Open file error", e);
+                System.exit(1);
+            } catch (SQLException e) {
+                Utils.logAndShowError(LOG, parent, "Error while read selected DB file.\n"
+                        + e.getMessage(),
+                        "Read selected DB error", e);
+                System.exit(1);
+            }
+        }
     }
 }

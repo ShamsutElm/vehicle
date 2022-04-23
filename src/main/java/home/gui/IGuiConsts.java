@@ -38,4 +38,7 @@ public interface IGuiConsts {
     String ABOUT_TITLE = "About";
     String ABOUT_TEXT = "Some think have to be here, but i'm not sure";
 
+    // DB Label
+    String CHOOSE_DB_FILE = "Choose SQLite DB file via file -> Open/Create";
+
 }
