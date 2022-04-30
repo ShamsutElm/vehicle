@@ -8,6 +8,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import javax.swing.JButton;
@@ -99,15 +101,28 @@ public class Gui {
 
     private void setStyle(String style) {
         try {
-            UIManager.setLookAndFeel(style.equalsIgnoreCase(IGuiConsts.SYSTEM)
-                    ? UIManager.getSystemLookAndFeelClassName()
-                    : UIManager.getCrossPlatformLookAndFeelClassName());
+            ColorSchema colorSchema = ColorSchema.getColorSchema(style);
+            if (colorSchema == null) {
+                throw new IllegalArgumentException("Incorrect style name: " + style);
+            }
+            UIManager.setLookAndFeel(colorSchema.getLookAndFeelClassName());
         } catch (Exception e) {
-            Utils.logAndShowError(LOG, frame,
-                    "Error while set the system color schema.\n"
-                            + "Default color schema will be used.\n"
-                            + e.getMessage(),
-                    "System color schema error", e);
+            try {
+                UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+                Settings.writeSettings(Settings.STYLE_SETTING_NAME,
+                        ColorSchema.CROSSPLATFORM.name().toLowerCase(Locale.ROOT));
+                Utils.logAndShowError(LOG, frame,
+                        "Error while set the system color schema.\n"
+                                + ColorSchema.CROSSPLATFORM.getNameForGui()
+                                + " color schema will be used.\n"
+                                + e.getMessage(),
+                        "System color schema error", e);
+            } catch (Exception ex) {
+                JFrame.setDefaultLookAndFeelDecorated(true);
+                Utils.logAndShowError(LOG, frame,
+                        "Error while set Default color schema.\n" + ex.getMessage(),
+                        "System color schema error", ex);
+            }
         }
     }
 
@@ -181,15 +196,29 @@ public class Gui {
         var fileMenu = new JMenu(IGuiConsts.FILE);
         fileMenu.add(createOrOpenItime);
 
-        var defaultItem = new JCheckBoxMenuItem(IGuiConsts.DEFAULT);
-        defaultItem.setSelected(Settings.STYLE.equalsIgnoreCase(IGuiConsts.DEFAULT));
-        var systemItem = new JCheckBoxMenuItem(IGuiConsts.SYSTEM);
-        systemItem.setSelected(Settings.STYLE.equalsIgnoreCase(IGuiConsts.SYSTEM));
-        defaultItem.addActionListener(actionEvent -> styleSelectAction(systemItem, defaultItem));
-        systemItem.addActionListener(actionEvent -> styleSelectAction(defaultItem, systemItem));
+        var checkBoxItems = new ArrayList<JCheckBoxMenuItem>();
+        JCheckBoxMenuItem crossPlatformCheckBoxItem = createCheckBoxMenuItem(
+                ColorSchema.CROSSPLATFORM, checkBoxItems);
+        JCheckBoxMenuItem gtkCheckBoxItem = createCheckBoxMenuItem(
+                ColorSchema.GTK, checkBoxItems);
+        JCheckBoxMenuItem macCheckBoxItem = createCheckBoxMenuItem(
+                ColorSchema.MAC, checkBoxItems);
+        JCheckBoxMenuItem metalCheckBoxItem = createCheckBoxMenuItem(
+                ColorSchema.METAL, checkBoxItems);
+        JCheckBoxMenuItem motifCheckBoxItem = createCheckBoxMenuItem(
+                ColorSchema.MOTIF, checkBoxItems);
+        JCheckBoxMenuItem nimbusCheckBoxItem = createCheckBoxMenuItem(
+                ColorSchema.NIMBUS, checkBoxItems);
+        JCheckBoxMenuItem systemCheckBoxItem = createCheckBoxMenuItem(
+                ColorSchema.SYSTEM, checkBoxItems);
         var styleMenu = new JMenu(IGuiConsts.STYLE);
-        styleMenu.add(defaultItem);
-        styleMenu.add(systemItem);
+        styleMenu.add(crossPlatformCheckBoxItem);
+        styleMenu.add(gtkCheckBoxItem);
+        styleMenu.add(macCheckBoxItem);
+        styleMenu.add(metalCheckBoxItem);
+        styleMenu.add(motifCheckBoxItem);
+        styleMenu.add(nimbusCheckBoxItem);
+        styleMenu.add(systemCheckBoxItem);
 
         var aboutItem = new JMenuItem(IGuiConsts.ABOUT);
         aboutItem.addActionListener(actionEvent -> JOptionPane.showMessageDialog(
@@ -204,17 +233,26 @@ public class Gui {
         menuBar.add(helpMenu);
     }
 
-    private void styleSelectAction(JCheckBoxMenuItem item1, JCheckBoxMenuItem item2) {
-        try {
-            item1.setSelected(!item2.isSelected());
+    private JCheckBoxMenuItem createCheckBoxMenuItem(ColorSchema colorSchema,
+            List<JCheckBoxMenuItem> checkBoxItems) {
+        var checkBoxMenuItem = new JCheckBoxMenuItem(colorSchema.getNameForGui());
+        checkBoxMenuItem.setSelected(colorSchema.name().equalsIgnoreCase(Settings.STYLE));
+        checkBoxItems.add(checkBoxMenuItem);
+        checkBoxMenuItem.addActionListener(actionEvent -> styleSelectAction(actionEvent, checkBoxItems));
+        return checkBoxMenuItem;
+    }
 
-            if (item1.isSelected()) {
-                Settings.writeSettings(Settings.STYLE_SETTING_NAME,
-                        item1.getText().toLowerCase(Locale.ROOT));
-            } else {
-                Settings.writeSettings(Settings.STYLE_SETTING_NAME,
-                        item2.getText().toLowerCase(Locale.ROOT));
-            }
+    private void styleSelectAction(ActionEvent actionEvent,
+            List<JCheckBoxMenuItem> checkBoxItems) {
+        try {
+            checkBoxItems.stream().forEach(item -> item.setSelected(false));
+
+            var selectedItem = (JCheckBoxMenuItem) actionEvent.getSource();
+            selectedItem.setSelected(true);
+
+            Settings.writeSettings(Settings.STYLE_SETTING_NAME,
+                    selectedItem.getText().toLowerCase(Locale.ROOT));
+
             setStyle(Settings.STYLE);
             SwingUtilities.updateComponentTreeUI(frame);
         } catch (Exception e) {
