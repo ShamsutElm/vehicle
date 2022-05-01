@@ -196,29 +196,7 @@ public class Gui {
         var fileMenu = new JMenu(IGuiConsts.FILE);
         fileMenu.add(createOrOpenItime);
 
-        var checkBoxItems = new ArrayList<JCheckBoxMenuItem>();
-        JCheckBoxMenuItem crossPlatformCheckBoxItem = createCheckBoxMenuItem(
-                ColorSchema.CROSSPLATFORM, checkBoxItems);
-        JCheckBoxMenuItem gtkCheckBoxItem = createCheckBoxMenuItem(
-                ColorSchema.GTK, checkBoxItems);
-        JCheckBoxMenuItem macCheckBoxItem = createCheckBoxMenuItem(
-                ColorSchema.MAC, checkBoxItems);
-        JCheckBoxMenuItem metalCheckBoxItem = createCheckBoxMenuItem(
-                ColorSchema.METAL, checkBoxItems);
-        JCheckBoxMenuItem motifCheckBoxItem = createCheckBoxMenuItem(
-                ColorSchema.MOTIF, checkBoxItems);
-        JCheckBoxMenuItem nimbusCheckBoxItem = createCheckBoxMenuItem(
-                ColorSchema.NIMBUS, checkBoxItems);
-        JCheckBoxMenuItem systemCheckBoxItem = createCheckBoxMenuItem(
-                ColorSchema.SYSTEM, checkBoxItems);
-        var styleMenu = new JMenu(IGuiConsts.STYLE);
-        styleMenu.add(crossPlatformCheckBoxItem);
-        styleMenu.add(gtkCheckBoxItem);
-        styleMenu.add(macCheckBoxItem);
-        styleMenu.add(metalCheckBoxItem);
-        styleMenu.add(motifCheckBoxItem);
-        styleMenu.add(nimbusCheckBoxItem);
-        styleMenu.add(systemCheckBoxItem);
+        JMenu styleMenu = creatFilledStyleMenu();
 
         var aboutItem = new JMenuItem(IGuiConsts.ABOUT);
         aboutItem.addActionListener(actionEvent -> JOptionPane.showMessageDialog(
@@ -231,6 +209,15 @@ public class Gui {
         menuBar.add(fileMenu);
         menuBar.add(styleMenu);
         menuBar.add(helpMenu);
+    }
+
+    private JMenu creatFilledStyleMenu() {
+        var styleMenu = new JMenu(IGuiConsts.STYLE);
+        var checkBoxItems = new ArrayList<JCheckBoxMenuItem>();
+        for (ColorSchema colorSchema : ColorSchema.values()) {
+            styleMenu.add(createCheckBoxMenuItem(colorSchema, checkBoxItems));
+        }
+        return styleMenu;
     }
 
     private JCheckBoxMenuItem createCheckBoxMenuItem(ColorSchema colorSchema,
