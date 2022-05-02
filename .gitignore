@@ -12,11 +12,11 @@
 # Application files
 
 /logs/
-*.db
-*.log
-*.properties
-*.sqlite
-*.sqlite3
+/*.db
+/*.log
+/*.properties
+/*.sqlite
+/*.sqlite3
 
 ##########
 
