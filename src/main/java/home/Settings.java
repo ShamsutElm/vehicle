@@ -73,7 +73,7 @@ public class Settings {
     }
 
     private final class Default {
-        private static final String STYLE = "default";
+        private static final String STYLE = "CrossPlatform";
         private static final String DB_FILE_PATH = "";
     }
 }
