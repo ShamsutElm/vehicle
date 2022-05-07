@@ -193,8 +193,11 @@ public class Gui {
     private void createMenu() {
         var createOrOpenItime = new JMenuItem(IGuiConsts.CREATE_OR_OPEN);
         createOrOpenItime.addActionListener(new CreateOrOpenActionListner(frame, dbLabel));
+        var saveItem = new JMenuItem(IGuiConsts.SAVE);
+        saveItem.addActionListener(null);
         var fileMenu = new JMenu(IGuiConsts.FILE);
         fileMenu.add(createOrOpenItime);
+        fileMenu.add(saveItem);
 
         JMenu styleMenu = creatFilledStyleMenu();
 

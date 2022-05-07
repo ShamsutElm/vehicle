@@ -44,7 +44,7 @@ public abstract class AbstractDialog extends CustomJDialog {
     private JTextField tfNumber;
     private JXDatePicker tfDate;
 
-    private JButton btnSave;
+    private JButton btnOk;
     private JButton btnCancel;
 
     protected JPanel pnlTextFields;
@@ -96,8 +96,8 @@ public abstract class AbstractDialog extends CustomJDialog {
     }
 
     private void createButtons() {
-        btnSave = CustomJButton.create(IGuiConsts.SAVE);
-        btnSave.addActionListener(actionEvent -> {
+        btnOk = CustomJButton.create(IGuiConsts.OK);
+        btnOk.addActionListener(actionEvent -> {
             fillDataObj();
             if (isObjFilled()) {
                 saveToDB();
@@ -120,7 +120,7 @@ public abstract class AbstractDialog extends CustomJDialog {
         pnlTextFields.add(tfDate);
 
         pnlButtons = CustomJPanel.create(PanelType.DIALOB_BUTTON_PANEL);
-        pnlButtons.add(btnSave);
+        pnlButtons.add(btnOk);
         pnlButtons.add(btnCancel);
     }
 
