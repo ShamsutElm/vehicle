@@ -3,17 +3,18 @@ package home.gui;
 import java.lang.reflect.Constructor;
 
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import home.Storage;
 import home.gui.components.dialog.AbstractDialog;
 import home.gui.components.dialog.DialogCar;
 import home.gui.components.dialog.DialogMoto;
 import home.gui.components.dialog.DialogTruck;
 import home.models.AbstractVehicle;
 import home.models.VehicleType;
+import home.utils.Utils;
 
 public class DialogCaller {
 
@@ -22,49 +23,49 @@ public class DialogCaller {
     private static final int OBJ_DIALOG_WIDTH = 450;
     private static final int OBJ_DIALOG_HEIGHT = 350;
 
+    public static <T extends AbstractDialog> void showObjDialog(JFrame frame, Class<T> dialogClass,
+            AbstractVehicle dataObj, int tblRowOfSelectedDataObj) {
+        try {
+            Constructor<T> constructor = dialogClass.getConstructor(
+                    new Class[] { int.class, int.class, AbstractVehicle.class, int.class });
+            T dialog = constructor.newInstance(
+                    OBJ_DIALOG_WIDTH, OBJ_DIALOG_HEIGHT, dataObj, tblRowOfSelectedDataObj);
+            dialog.buildDialog();
+        } catch (Exception e) {
+            Utils.logAndShowError(LOG, frame, "Ошибка создания диалогового окна.\n"
+                    + e.getMessage(), "Ошибка диалогового окна", e);
+        }
+    }
+
     public static <T extends AbstractDialog> void showObjDialog(JFrame frame, Class<T> dialogClass) {
-        showObjDialog(frame, dialogClass, null);
+        showObjDialog(frame, dialogClass, null, Storage.NO_ROW_IS_SELECTED);
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends AbstractDialog> void showObjDialog(JFrame frame, AbstractVehicle dataObj) {
+    public static <T extends AbstractDialog> void showObjDialog(JFrame frame,
+            AbstractVehicle dataObj, int tblRowOfSelectedDataObj) {
         Class<T> dialogClass = null;
         VehicleType objtType = dataObj.getType();
         switch (objtType) {
-        case CAR:
-            dialogClass = (Class<T>) DialogCar.class;
-            break;
+            case CAR:
+                dialogClass = (Class<T>) DialogCar.class;
+                break;
 
-        case TRUCK:
-            dialogClass = (Class<T>) DialogTruck.class;
-            break;
+            case TRUCK:
+                dialogClass = (Class<T>) DialogTruck.class;
+                break;
 
-        case MOTORCYCLE:
-            dialogClass = (Class<T>) DialogMoto.class;
-            break;
+            case MOTORCYCLE:
+                dialogClass = (Class<T>) DialogMoto.class;
+                break;
 
-        default:
-            JOptionPane.showMessageDialog(frame, "Нет диологового окна для [" + objtType + ']',
-                    "Ошибка типа диологового окна", JOptionPane.ERROR_MESSAGE);
-            return;
+            default:
+                Utils.logAndShowError(LOG, frame, "Нет диологового окна для [" + objtType + ']',
+                        "Ошибка типа диологового окна",
+                        new IllegalAccessException("Ошибка типа диологового окна"));
+                return;
         }
-        showObjDialog(frame, dialogClass, dataObj);
-    }
-
-    public static <T extends AbstractDialog> void showObjDialog(JFrame frame, Class<T> dialogClass,
-            AbstractVehicle dataObj) {
-
-        try {
-            Constructor<T> constructor = dialogClass.getConstructor(
-                    new Class[] { int.class, int.class, AbstractVehicle.class });
-            T dialog = constructor.newInstance(
-                    OBJ_DIALOG_WIDTH, OBJ_DIALOG_HEIGHT, dataObj);
-            dialog.buildDialog();
-        } catch (Exception e) {
-            LOG.error("Dialog error", e);
-            JOptionPane.showInternalMessageDialog(frame, "Ошибка создания диалогового окна.\n"
-                    + e.getMessage(), "Ошибка диалогового окна", JOptionPane.ERROR_MESSAGE);
-        }
+        showObjDialog(frame, dialogClass, dataObj, tblRowOfSelectedDataObj);
     }
 
     private DialogCaller() {

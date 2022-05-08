@@ -1,7 +1,6 @@
 package home.gui.components.dialog;
 
 import java.awt.BorderLayout;
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.function.Predicate;
 
@@ -16,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import home.Storage;
-import home.db.dao.DaoSQLite;
+import home.gui.Gui;
 import home.gui.IGuiConsts;
 import home.gui.components.CustomJButton;
 import home.gui.components.CustomJDialog;
@@ -52,9 +51,12 @@ public abstract class AbstractDialog extends CustomJDialog {
 
     protected AbstractVehicle dataObj;
     protected boolean isNewDataObj;
+    protected int tblRowOfSelectedDataObj;
 
-    public AbstractDialog(String title, int widht, int height, AbstractVehicle dataObj) {
+    public AbstractDialog(String title, int widht, int height,
+            AbstractVehicle dataObj, int tblRowOfSelectedDataObj) {
         super(title, widht, height);
+        this.tblRowOfSelectedDataObj = tblRowOfSelectedDataObj;
         if (dataObj != null) {
             this.dataObj = dataObj;
             isNewDataObj = false;
@@ -100,8 +102,8 @@ public abstract class AbstractDialog extends CustomJDialog {
         btnOk.addActionListener(actionEvent -> {
             fillDataObj();
             if (isObjFilled()) {
-                saveToDB();
-                refreshGuiTable();
+                Storage.getInstance().updateStorage(dataObj, tblRowOfSelectedDataObj);
+                Gui.getInstance().refreshTable();
                 dispose();
             }
         });
@@ -138,28 +140,6 @@ public abstract class AbstractDialog extends CustomJDialog {
 
     private boolean isObjFilled() {
         return IS_FILLED.test(dataObj.getColor()) && IS_FILLED.test(dataObj.getNumber());
-    }
-
-    private void saveToDB() {
-        try {
-            if (dataObj.getId() == 0) {
-                DaoSQLite.getInstance().create(dataObj);
-            } else {
-                DaoSQLite.getInstance().update(dataObj);
-            }
-        } catch (SQLException e) {
-            logAndShowError("Ошибка во время сохранения в БД", "Ошибка сохранения", e);
-        }
-    }
-
-    private void refreshGuiTable() {
-        // TODO make in thread
-        try {
-            Storage.getInstance().refresh(DaoSQLite.getInstance().readAll());
-        } catch (SQLException e) {
-            logAndShowError("Ошибка во время обнавление таблицы, после создания объекта",
-                    "Ошибка обновления Gui", e);
-        }
     }
 
     private void logAndShowError(String msg, String title, Exception e) {
