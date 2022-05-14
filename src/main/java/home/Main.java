@@ -49,13 +49,14 @@ public class Main {
     }
 
     private static void readDataFromDB() {
-        // TODO make it in thread
-        try {
-            Storage.getInstance().refresh(DaoSQLite.getInstance().readAll());
-        } catch (Exception e) {
-            Utils.logAndShowError(LOG, null, "Error while read data from DB: "
-                    + e.getMessage(), "Data reading error", e);
-            System.exit(1);
-        }
+        Utils.ruInThread("read data from DB", () -> {
+            try {
+                Storage.getInstance().refresh(DaoSQLite.getInstance().readAll());
+            } catch (Exception e) {
+                Utils.logAndShowError(LOG, null, "Error while read data from DB: "
+                        + e.getMessage(), "Data reading error", e);
+                System.exit(1);
+            }
+        });
     }
 }

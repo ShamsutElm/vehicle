@@ -164,13 +164,15 @@ public class Gui {
 
         btnDel = CustomJButton.create(IGuiConsts.DEL);
         btnDel.addActionListener(actionEvent -> {
-            List<AbstractVehicle> objsMarkedForDel = Storage.getInstance().getAll().stream()
-                    .filter(dataObj -> dataObj.isMarkedForDelete())
-                    .collect(Collectors.toList());
-            if (!objsMarkedForDel.isEmpty()) {
-                Storage.getInstance().deleteObjects(objsMarkedForDel);
-                Gui.getInstance().refreshTable();
-            }
+            Utils.ruInThread("delete action", () -> {
+                List<AbstractVehicle> objsMarkedForDel = Storage.getInstance().getAll().stream()
+                        .filter(dataObj -> dataObj.isMarkedForDelete())
+                        .collect(Collectors.toList());
+                if (!objsMarkedForDel.isEmpty()) {
+                    Storage.getInstance().deleteObjects(objsMarkedForDel);
+                    Gui.getInstance().refreshTable();
+                }
+            });
         });
     }
 
@@ -266,22 +268,23 @@ public class Gui {
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            // TODO make it in thread
-            try {
-                CustomJFileChooser.create(parent, IGuiConsts.CREATE_OR_OPEN).showChooser();
-                DbInitializer.createTableIfNotExists();
-                Storage.getInstance().refresh(DaoSQLite.getInstance().readAll());
-                dbLabel.setText(Settings.DB_FILE_PATH);
-            } catch (IOException e) {
-                Utils.logAndShowError(LOG, parent, "Error while create/open DB file.",
-                        "Create/Open file error", e);
-                System.exit(1);
-            } catch (SQLException e) {
-                Utils.logAndShowError(LOG, parent, "Error while read selected DB file.\n"
-                        + e.getMessage(),
-                        "Read selected DB error", e);
-                System.exit(1);
-            }
+            Utils.ruInThread("create or open DB file", () -> {
+                try {
+                    CustomJFileChooser.create(parent, IGuiConsts.CREATE_OR_OPEN).showChooser();
+                    DbInitializer.createTableIfNotExists();
+                    Storage.getInstance().refresh(DaoSQLite.getInstance().readAll());
+                    dbLabel.setText(Settings.DB_FILE_PATH);
+                } catch (IOException e) {
+                    Utils.logAndShowError(LOG, parent, "Error while create/open DB file.",
+                            "Create/Open file error", e);
+                    System.exit(1);
+                } catch (SQLException e) {
+                    Utils.logAndShowError(LOG, parent, "Error while read selected DB file.\n"
+                            + e.getMessage(),
+                            "Read selected DB error", e);
+                    System.exit(1);
+                }
+            });
         }
     }
 
@@ -295,21 +298,22 @@ public class Gui {
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            try {
-                CustomJFileChooser.create(parent, IGuiConsts.SAVE).showChooser();
-                DbInitializer.createTableIfNotExists();
-                DaoSQLite.getInstance().saveAllChanges();
-                Storage.getInstance().refresh(DaoSQLite.getInstance().readAll());
-            } catch (IOException e) {
-                Utils.logAndShowError(LOG, parent, "Error while create/open DB file.",
-                        "create/open DB file", e);
-                System.exit(1);
-            } catch (SQLException e) {
-                Utils.logAndShowError(LOG, parent, "Error while read selected Db file.\n"
-                        + e.getMessage(), "read selected DB file", e);
-                System.exit(1);
-            }
+            Utils.ruInThread("save data to DB", () -> {
+                try {
+                    CustomJFileChooser.create(parent, IGuiConsts.SAVE).showChooser();
+                    DbInitializer.createTableIfNotExists();
+                    DaoSQLite.getInstance().saveAllChanges();
+                    Storage.getInstance().refresh(DaoSQLite.getInstance().readAll());
+                } catch (IOException e) {
+                    Utils.logAndShowError(LOG, parent, "Error while create/open DB file.",
+                            "create/open DB file", e);
+                    System.exit(1);
+                } catch (SQLException e) {
+                    Utils.logAndShowError(LOG, parent, "Error while read selected Db file.\n"
+                            + e.getMessage(), "read selected DB file", e);
+                    System.exit(1);
+                }
+            });
         }
-
     }
 }
