@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import home.Storage;
 import home.db.Connector;
 import home.db.IDbConsts;
 import home.models.AbstractVehicle;
@@ -84,29 +85,29 @@ public class DaoSQLite implements IDao {
 
         AbstractVehicle vehicle = null;
         switch (vehicleType) {
-        case CAR:
-            vehicle = new Car();
-            var car = (Car) vehicle;
-            car.setTransportsPassengers(
-                    convertToBoolean(res.getInt(IDbConsts.IS_TRANSPORTS_PASSENGERS)));
-            car.setHasTrailer(
-                    convertToBoolean(res.getInt(IDbConsts.HAS_TRAILER)));
-            break;
+            case CAR:
+                vehicle = new Car();
+                var car = (Car) vehicle;
+                car.setTransportsPassengers(
+                        convertToBoolean(res.getInt(IDbConsts.IS_TRANSPORTS_PASSENGERS)));
+                car.setHasTrailer(
+                        convertToBoolean(res.getInt(IDbConsts.HAS_TRAILER)));
+                break;
 
-        case TRUCK:
-            vehicle = new Truck();
-            var truck = (Truck) vehicle;
-            truck.setTransportsCargo(
-                    convertToBoolean(res.getInt(IDbConsts.IS_TRANSPORTS_CARGO)));
-            truck.setHasTrailer(
-                    convertToBoolean(res.getInt(IDbConsts.HAS_TRAILER)));
-            break;
+            case TRUCK:
+                vehicle = new Truck();
+                var truck = (Truck) vehicle;
+                truck.setTransportsCargo(
+                        convertToBoolean(res.getInt(IDbConsts.IS_TRANSPORTS_CARGO)));
+                truck.setHasTrailer(
+                        convertToBoolean(res.getInt(IDbConsts.HAS_TRAILER)));
+                break;
 
-        case MOTORCYCLE:
-            vehicle = new Motorcycle();
-            ((Motorcycle) vehicle).setHasCradle(
-                    convertToBoolean(res.getInt(IDbConsts.HAS_CRADLE)));
-            break;
+            case MOTORCYCLE:
+                vehicle = new Motorcycle();
+                ((Motorcycle) vehicle).setHasCradle(
+                        convertToBoolean(res.getInt(IDbConsts.HAS_CRADLE)));
+                break;
         }
 
         vehicle.setId(res.getLong(IDbConsts.ID));
@@ -119,14 +120,14 @@ public class DaoSQLite implements IDao {
 
     private boolean convertToBoolean(int intBoolean) throws SQLException {
         switch (intBoolean) {
-        case 0:
-            return false;
+            case 0:
+                return false;
 
-        case 1:
-            return true;
+            case 1:
+                return true;
 
-        default:
-            throw new SQLException("Не правильное логическое значение: " + intBoolean);
+            default:
+                throw new SQLException("Не правильное логическое значение: " + intBoolean);
         }
     }
 
@@ -142,21 +143,21 @@ public class DaoSQLite implements IDao {
             pstmt.setLong(4, dataObj.getDateTime());
 
             switch (dataObjType) {
-            case CAR:
-                Car car = (Car) dataObj;
-                pstmt.setInt(6, converToInt(car.isTransportsPassengers()));
-                pstmt.setInt(7, converToInt(car.hasTrailer()));
-                break;
+                case CAR:
+                    Car car = (Car) dataObj;
+                    pstmt.setInt(6, converToInt(car.isTransportsPassengers()));
+                    pstmt.setInt(7, converToInt(car.hasTrailer()));
+                    break;
 
-            case TRUCK:
-                Truck truck = (Truck) dataObj;
-                pstmt.setInt(5, converToInt(truck.isTransportsCargo()));
-                pstmt.setInt(7, converToInt(truck.hasTrailer()));
-                break;
+                case TRUCK:
+                    Truck truck = (Truck) dataObj;
+                    pstmt.setInt(5, converToInt(truck.isTransportsCargo()));
+                    pstmt.setInt(7, converToInt(truck.hasTrailer()));
+                    break;
 
-            case MOTORCYCLE:
-                pstmt.setInt(8, converToInt(((Motorcycle) dataObj).hasCradle()));
-                break;
+                case MOTORCYCLE:
+                    pstmt.setInt(8, converToInt(((Motorcycle) dataObj).hasCradle()));
+                    break;
             }
 
             if (pstmt.executeUpdate() != 1) {
@@ -181,21 +182,21 @@ public class DaoSQLite implements IDao {
             pstmt.setLong(4, dataObj.getDateTime());
 
             switch (dataObjType) {
-            case CAR:
-                Car car = (Car) dataObj;
-                pstmt.setInt(6, converToInt(car.isTransportsPassengers()));
-                pstmt.setInt(7, converToInt(car.hasTrailer()));
-                break;
+                case CAR:
+                    Car car = (Car) dataObj;
+                    pstmt.setInt(6, converToInt(car.isTransportsPassengers()));
+                    pstmt.setInt(7, converToInt(car.hasTrailer()));
+                    break;
 
-            case TRUCK:
-                Truck truck = (Truck) dataObj;
-                pstmt.setInt(5, converToInt(truck.isTransportsCargo()));
-                pstmt.setInt(7, converToInt(truck.hasTrailer()));
-                break;
+                case TRUCK:
+                    Truck truck = (Truck) dataObj;
+                    pstmt.setInt(5, converToInt(truck.isTransportsCargo()));
+                    pstmt.setInt(7, converToInt(truck.hasTrailer()));
+                    break;
 
-            case MOTORCYCLE:
-                pstmt.setInt(8, converToInt(((Motorcycle) dataObj).hasCradle()));
-                break;
+                case MOTORCYCLE:
+                    pstmt.setInt(8, converToInt(((Motorcycle) dataObj).hasCradle()));
+                    break;
             }
 
             pstmt.setLong(9, dataObj.getId());
@@ -220,6 +221,23 @@ public class DaoSQLite implements IDao {
             if (pstmt.executeUpdate() <= 0) {
                 throw new SQLException("Информация не была удалена из БД: "
                         + Utils.idsToString(ids));
+            }
+        }
+    }
+
+    @Override
+    public void saveAllChanges() throws SQLException {
+        Long[] idsForDel = Storage.getInstance().getIdsForDel();
+        if (idsForDel.length > 0) {
+            delete(idsForDel);
+        }
+
+        for (AbstractVehicle dataObj : Storage.getInstance().getAll()) {
+            long id = dataObj.getId();
+            if (id > 0) {
+                update(dataObj);
+            } else {
+                create(dataObj);
             }
         }
     }

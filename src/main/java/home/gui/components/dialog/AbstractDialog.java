@@ -1,22 +1,18 @@
 package home.gui.components.dialog;
 
 import java.awt.BorderLayout;
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.function.Predicate;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.jdesktop.swingx.JXDatePicker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import home.Storage;
-import home.db.dao.DaoSQLite;
+import home.gui.Gui;
 import home.gui.IGuiConsts;
 import home.gui.components.CustomJButton;
 import home.gui.components.CustomJDialog;
@@ -30,8 +26,6 @@ import home.models.AbstractVehicle;
 @SuppressWarnings("serial")
 public abstract class AbstractDialog extends CustomJDialog {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractDialog.class);
-
     private static final int TEXT_FIELD_COLUMN_NUMBERS = 9;
 
     private static Predicate<String> IS_FILLED = str -> str != null && !str.isBlank();
@@ -44,7 +38,7 @@ public abstract class AbstractDialog extends CustomJDialog {
     private JTextField tfNumber;
     private JXDatePicker tfDate;
 
-    private JButton btnSave;
+    private JButton btnOk;
     private JButton btnCancel;
 
     protected JPanel pnlTextFields;
@@ -52,9 +46,12 @@ public abstract class AbstractDialog extends CustomJDialog {
 
     protected AbstractVehicle dataObj;
     protected boolean isNewDataObj;
+    protected int tblRowOfSelectedDataObj;
 
-    public AbstractDialog(String title, int widht, int height, AbstractVehicle dataObj) {
+    public AbstractDialog(String title, int widht, int height,
+            AbstractVehicle dataObj, int tblRowOfSelectedDataObj) {
         super(title, widht, height);
+        this.tblRowOfSelectedDataObj = tblRowOfSelectedDataObj;
         if (dataObj != null) {
             this.dataObj = dataObj;
             isNewDataObj = false;
@@ -96,12 +93,12 @@ public abstract class AbstractDialog extends CustomJDialog {
     }
 
     private void createButtons() {
-        btnSave = CustomJButton.create(IGuiConsts.SAVE);
-        btnSave.addActionListener(actionEvent -> {
+        btnOk = CustomJButton.create(IGuiConsts.OK);
+        btnOk.addActionListener(actionEvent -> {
             fillDataObj();
             if (isObjFilled()) {
-                saveToDB();
-                refreshGuiTable();
+                Storage.getInstance().updateStorage(dataObj, tblRowOfSelectedDataObj);
+                Gui.getInstance().refreshTable();
                 dispose();
             }
         });
@@ -120,7 +117,7 @@ public abstract class AbstractDialog extends CustomJDialog {
         pnlTextFields.add(tfDate);
 
         pnlButtons = CustomJPanel.create(PanelType.DIALOB_BUTTON_PANEL);
-        pnlButtons.add(btnSave);
+        pnlButtons.add(btnOk);
         pnlButtons.add(btnCancel);
     }
 
@@ -138,33 +135,5 @@ public abstract class AbstractDialog extends CustomJDialog {
 
     private boolean isObjFilled() {
         return IS_FILLED.test(dataObj.getColor()) && IS_FILLED.test(dataObj.getNumber());
-    }
-
-    private void saveToDB() {
-        try {
-            if (dataObj.getId() == 0) {
-                DaoSQLite.getInstance().create(dataObj);
-            } else {
-                DaoSQLite.getInstance().update(dataObj);
-            }
-        } catch (SQLException e) {
-            logAndShowError("Ошибка во время сохранения в БД", "Ошибка сохранения", e);
-        }
-    }
-
-    private void refreshGuiTable() {
-        // TODO make in thread
-        try {
-            Storage.getInstance().refresh(DaoSQLite.getInstance().readAll());
-        } catch (SQLException e) {
-            logAndShowError("Ошибка во время обнавление таблицы, после создания объекта",
-                    "Ошибка обновления Gui", e);
-        }
-    }
-
-    private void logAndShowError(String msg, String title, Exception e) {
-        LOG.error(msg, e);
-        JOptionPane.showInternalMessageDialog(this, msg + "\n" + e.getMessage(),
-                title, JOptionPane.ERROR_MESSAGE);
     }
 }
