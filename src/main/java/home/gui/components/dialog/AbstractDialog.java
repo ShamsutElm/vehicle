@@ -6,13 +6,10 @@ import java.util.function.Predicate;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.jdesktop.swingx.JXDatePicker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import home.Storage;
 import home.gui.Gui;
@@ -28,8 +25,6 @@ import home.models.AbstractVehicle;
 
 @SuppressWarnings("serial")
 public abstract class AbstractDialog extends CustomJDialog {
-
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractDialog.class);
 
     private static final int TEXT_FIELD_COLUMN_NUMBERS = 9;
 
@@ -140,11 +135,5 @@ public abstract class AbstractDialog extends CustomJDialog {
 
     private boolean isObjFilled() {
         return IS_FILLED.test(dataObj.getColor()) && IS_FILLED.test(dataObj.getNumber());
-    }
-
-    private void logAndShowError(String msg, String title, Exception e) {
-        LOG.error(msg, e);
-        JOptionPane.showInternalMessageDialog(this, msg + "\n" + e.getMessage(),
-                title, JOptionPane.ERROR_MESSAGE);
     }
 }
