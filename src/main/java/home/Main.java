@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import home.db.DbInitializer;
 import home.db.dao.DaoSQLite;
 import home.gui.Gui;
+import home.gui.IGuiConsts;
 import home.gui.components.CustomJFileChooser;
 import home.utils.Utils;
 
@@ -23,7 +24,7 @@ public class Main {
             if (Settings.hasPathToDBFile()) {
                 initDB();
             } else {
-                CustomJFileChooser.create(null).showCreateOrOpen();
+                CustomJFileChooser.create(null, IGuiConsts.CREATE_OR_OPEN).showChooser();
                 initDB();
                 Gui.getInstance().setDBLabel(Settings.DB_FILE_PATH);
             }
@@ -48,13 +49,14 @@ public class Main {
     }
 
     private static void readDataFromDB() {
-        // TODO make it in thread
-        try {
-            Storage.getInstance().refresh(DaoSQLite.getInstance().readAll());
-        } catch (Exception e) {
-            Utils.logAndShowError(LOG, null, "Error while read data from DB: "
-                    + e.getMessage(), "Data reading error", e);
-            System.exit(1);
-        }
+        Utils.ruInThread("read data from DB", () -> {
+            try {
+                Storage.getInstance().refresh(DaoSQLite.getInstance().readAll());
+            } catch (Exception e) {
+                Utils.logAndShowError(LOG, null, "Error while read data from DB: "
+                        + e.getMessage(), "Data reading error", e);
+                System.exit(1);
+            }
+        });
     }
 }

@@ -18,7 +18,7 @@ public interface IGuiConsts {
     String TRUCK = "Truck";
     String MOTO = "Motocycle";
     String DEL = "Delete";
-    String SAVE = "Save";
+    String OK = "Ok";
     String CANCEL = "Cancel";
     String HAS_TRAILER = "has trailer";
     String HAS_CRADLE = "has cradle";
@@ -28,6 +28,7 @@ public interface IGuiConsts {
     // Menu names
     String FILE = "File";
     String CREATE_OR_OPEN = "Create/Open";
+    String SAVE = "Save";
     String STYLE = "Style";
     String DEFAULT = "Default";
     String SYSTEM = "System";

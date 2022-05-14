@@ -12,8 +12,9 @@ public class DialogTruck extends AbstractDialogTrailer {
 
     private JCheckBox chkCargo;
 
-    public DialogTruck(int widht, int height, AbstractVehicle dataObj) {
-        super(VehicleType.TRUCK.name(), widht, height, dataObj);
+    public DialogTruck(int widht, int height,
+            AbstractVehicle dataObj, int tblRowOfSelectedDataObj) {
+        super(VehicleType.TRUCK.name(), widht, height, dataObj, tblRowOfSelectedDataObj);
     }
 
     @Override
