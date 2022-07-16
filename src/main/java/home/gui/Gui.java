@@ -140,7 +140,7 @@ public class Gui {
                 if (CLICK_COUNT == mouseEvent.getClickCount()) {
                     int selectedTableRow = table.getSelectedRow();
                     DialogCaller.showObjDialog(frame,
-                            Storage.getInstance().get(selectedTableRow), selectedTableRow);
+                            Storage.INSTANCE.get(selectedTableRow), selectedTableRow);
                 }
             }
         });
@@ -165,11 +165,11 @@ public class Gui {
         btnDel = CustomJButton.create(IGuiConsts.DEL);
         btnDel.addActionListener(actionEvent -> {
             Utils.ruInThread("delete action", () -> {
-                List<AbstractVehicle> objsMarkedForDel = Storage.getInstance().getAll().stream()
+                List<AbstractVehicle> objsMarkedForDel = Storage.INSTANCE.getAll().stream()
                         .filter(dataObj -> dataObj.isMarkedForDelete())
                         .collect(Collectors.toList());
                 if (!objsMarkedForDel.isEmpty()) {
-                    Storage.getInstance().deleteObjects(objsMarkedForDel);
+                    Storage.INSTANCE.deleteObjects(objsMarkedForDel);
                     Gui.getInstance().refreshTable();
                 }
             });
@@ -272,7 +272,7 @@ public class Gui {
                 try {
                     CustomJFileChooser.create(parent, IGuiConsts.CREATE_OR_OPEN).showChooser();
                     DbInitializer.createTableIfNotExists();
-                    Storage.getInstance().refresh(DaoSQLite.getInstance().readAll());
+                    Storage.INSTANCE.refresh(DaoSQLite.getInstance().readAll());
                     dbLabel.setText(Settings.DB_FILE_PATH);
                 } catch (IOException e) {
                     Utils.logAndShowError(LOG, parent, "Error while create/open DB file.",
@@ -303,7 +303,7 @@ public class Gui {
                     CustomJFileChooser.create(parent, IGuiConsts.SAVE).showChooser();
                     DbInitializer.createTableIfNotExists();
                     DaoSQLite.getInstance().saveAllChanges();
-                    Storage.getInstance().refresh(DaoSQLite.getInstance().readAll());
+                    Storage.INSTANCE.refresh(DaoSQLite.getInstance().readAll());
                 } catch (IOException e) {
                     Utils.logAndShowError(LOG, parent, "Error while create/open DB file.",
                             "create/open DB file", e);

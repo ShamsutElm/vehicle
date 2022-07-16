@@ -37,8 +37,8 @@ public class DbInitializer {
     }
 
     public static void createTableIfNotExists() throws SQLException {
-        try (var connection = Connector.getConnetion();
-                var stmt = connection.createStatement()) {
+        try (var connection = Connector.getConnetionToSQLite();
+             var stmt = connection.createStatement()) {
             stmt.execute(CREATE_TBL_QUERY);
         }
     }

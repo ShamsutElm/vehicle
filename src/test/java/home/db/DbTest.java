@@ -15,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import home.Settings;
+import home.Storage;
 import home.db.dao.DaoSQLite;
 import home.models.AbstractVehicle;
 import home.models.Car;
@@ -67,18 +68,27 @@ public class DbTest {
     @Test
     public void createReadDataTest() {
         try {
-            var dataObj = new Car();
-            dataObj.setId(1);
-            dataObj.setColor("Green");
-            dataObj.setNumber("17454");
-            dataObj.setDateTime(System.currentTimeMillis());
-            dataObj.setTransportsPassengers(true);
-            DaoSQLite.getInstance().create(dataObj);
+            // There os no id yet in new data object. Id will be set in database.
+            // That is why we will set it later, from read database object.
+            // It's need for correct comparison.
+            var cretedDataObj = new Car();
+            cretedDataObj.setColor("Green");
+            cretedDataObj.setNumber("17454");
+            cretedDataObj.setDateTime(System.currentTimeMillis());
+            cretedDataObj.setTransportsPassengers(true);
 
-            AbstractVehicle readDataObject = DaoSQLite.getInstance().readOne(1);
+            Storage.INSTANCE.updateStorage(cretedDataObj, Storage.NO_ROW_IS_SELECTED);
+            DaoSQLite.getInstance().saveAllChanges();
 
-            assertNotNull(readDataObject, "Read data object is null.");
-            assertEquals(dataObj, readDataObject);
+            long id = 1;
+            AbstractVehicle readedDataObject = DaoSQLite.getInstance().readOne(id);
+
+            assertNotNull(readedDataObject, "Read data object is null.");
+
+            // As said before, here we set id from read database object.
+            cretedDataObj.setId(readedDataObject.getId());
+
+            assertEquals(cretedDataObj, readedDataObject);
         } catch (SQLException e) {
             fail("Error while works with DB.", e);
         }

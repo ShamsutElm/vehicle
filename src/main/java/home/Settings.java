@@ -6,8 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import home.utils.Utils;
-
 // TODO make sigletone
 public class Settings {
 
@@ -32,17 +30,17 @@ public class Settings {
         try (var outputStream = new FileOutputStream(SETTINGS_FILE_NAME)) {
             SETTINGS.store(outputStream, null);
         } catch (IOException e) {
-            throw Utils.getNewException(e, "Error while filling the setting file");
+            throw new IllegalStateException("Error while filling the setting file: " + SETTINGS_FILE_NAME, e);
         }
         readSettings();
     }
 
-    public static void readSettings() throws IOException {
+    public static void readSettings() {
         try (var inputStream = new FileInputStream(getSettingsPath())) {
             SETTINGS.load(inputStream);
         } catch (IOException e) {
-            throw Utils.getNewException(e, "Error while read setttings from file: "
-                    + SETTINGS_FILE_NAME);
+            throw new IllegalStateException("Error while read setttings from file: "
+                    + SETTINGS_FILE_NAME, e);
         }
 
         STYLE = SETTINGS.getProperty(STYLE_SETTING_NAME, Default.STYLE);
@@ -58,7 +56,7 @@ public class Settings {
             }
             return file.getAbsolutePath();
         } catch (IOException e) {
-            throw Utils.getNewException(e, "Error while creating the settings file");
+            throw new IllegalStateException("Error while creating the settings file: " + SETTINGS_FILE_NAME, e);
         }
     }
 
@@ -68,7 +66,7 @@ public class Settings {
             SETTINGS.setProperty(DB_FILE_PATH_SETTING_NAME, Default.DB_FILE_PATH);
             SETTINGS.store(outputStream, null);
         } catch (IOException e) {
-            throw Utils.getNewException(e, "Error while fill default settings");
+            throw new IllegalStateException("Error while fill default settings: " + SETTINGS_FILE_NAME, e);
         }
     }
 

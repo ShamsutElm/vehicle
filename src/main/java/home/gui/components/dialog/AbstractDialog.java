@@ -97,7 +97,7 @@ public abstract class AbstractDialog extends CustomJDialog {
         btnOk.addActionListener(actionEvent -> {
             fillDataObj();
             if (isObjFilled()) {
-                Storage.getInstance().updateStorage(dataObj, tblRowOfSelectedDataObj);
+                Storage.INSTANCE.updateStorage(dataObj, tblRowOfSelectedDataObj);
                 Gui.getInstance().refreshTable();
                 dispose();
             }

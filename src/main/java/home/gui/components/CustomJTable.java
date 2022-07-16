@@ -23,7 +23,7 @@ public class CustomJTable extends JTable {
 
     public static JTable create() {
         var tbl = new CustomJTable();
-        tbl.setModel(new CustomJTableDataModel(Storage.getInstance().getAll()));
+        tbl.setModel(new CustomJTableDataModel(Storage.INSTANCE.getAll()));
         tbl.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tbl.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 //        tbl.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);

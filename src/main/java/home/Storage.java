@@ -1,33 +1,26 @@
 package home;
 
-import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 import home.gui.Gui;
 import home.models.AbstractVehicle;
 
-public class Storage {
+public enum Storage {
+
+    INSTANCE;
 
     public static final int NO_ROW_IS_SELECTED = -1;
 
-    private final List<AbstractVehicle> dataObjsStorage = new ArrayList<>();
+    private final List<AbstractVehicle> dataObjsStorage = new LinkedList<>();
     private final Set<Long> dataObjIdsForDel = new HashSet<>();
-
-    private static Storage instance;
-
-    private Storage() {
-    }
-
-    public static Storage getInstance() {
-        if (instance == null) {
-            instance = new Storage();
-        }
-        return instance;
-    }
+    private final Set<Long> dataObjIdsForUpdate = new HashSet<>();
 
     public void refresh(List<AbstractVehicle> dataObjs) {
+        dataObjIdsForDel.clear();
+        dataObjIdsForUpdate.clear();
         dataObjsStorage.clear();
         dataObjsStorage.addAll(dataObjs);
         Gui.getInstance().refreshTable();
@@ -45,11 +38,16 @@ public class Storage {
         return dataObjIdsForDel.stream().map(id -> Long.valueOf(id)).toArray(Long[]::new);
     }
 
+    public Set<Long> getIdsForUpdate() {
+        return dataObjIdsForUpdate;
+    }
+
     public void updateStorage(AbstractVehicle dataObj, int tblRowOfSelectedDataObj) {
         if (NO_ROW_IS_SELECTED == tblRowOfSelectedDataObj) {
             dataObjsStorage.add(dataObj);
         } else {
             dataObjsStorage.set(tblRowOfSelectedDataObj, dataObj);
+            dataObjIdsForUpdate.add(dataObj.getId());
         }
     }
 
