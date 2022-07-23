@@ -49,7 +49,7 @@ public class Main {
     }
 
     private static void readDataFromDB() {
-        Utils.runInThread("read data from DB", () -> {
+        Utils.runInThread("-> read data from DB", () -> {
             try {
                 Storage.INSTANCE.refresh(DaoSQLite.getInstance().readAll());
             } catch (Exception e) {

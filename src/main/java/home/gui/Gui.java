@@ -167,7 +167,7 @@ public class Gui {
 
         btnDel = CustomJButton.create(IGuiConsts.DEL);
         btnDel.addActionListener(actionEvent -> {
-            Utils.runInThread("delete action", () -> {
+            Utils.runInThread("-> delete action", () -> {
                 List<AbstractVehicle> objsMarkedForDel = Storage.INSTANCE.getAll().stream()
                         .filter(dataObj -> dataObj.isMarkedForDelete())
                         .collect(Collectors.toList());
@@ -276,7 +276,7 @@ public class Gui {
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            Utils.runInThread("create or open DB file", () -> {
+            Utils.runInThread("-> create or open DB file", () -> {
                 try {
                     CustomJFileChooser.createAndShowChooser(parent, ChooserOperation.CREATE_OR_OPEN);
                     DbInitializer.createTableIfNotExists();
@@ -310,7 +310,7 @@ public class Gui {
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            Utils.runInThread("save data to DB", () -> {
+            Utils.runInThread("-> save data to DB", () -> {
                 try {
                     if (isSaveAs) {
                         try {
