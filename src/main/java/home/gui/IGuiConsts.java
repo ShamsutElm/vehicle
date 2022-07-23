@@ -40,7 +40,7 @@ public interface IGuiConsts {
 
     // About dialog text
     String ABOUT_TITLE = "About";
-    String ABOUT_TEXT = "Some think have to be here, but i'm not sure";
+    String ABOUT_TEXT = "Test application.\nVersion: %s";
 
     // Save dialog text
     String SAVE_TITLE = "Save";

@@ -31,6 +31,7 @@ import javax.swing.table.AbstractTableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import home.Main;
 import home.Settings;
 import home.Settings.Setting;
 import home.Storage;
@@ -208,8 +209,8 @@ public class Gui {
         menuBar.add(creatStyleMenu());
 
         JMenuItem aboutItem = createMenuItem(IGuiConsts.ABOUT, actionEvent -> JOptionPane.showMessageDialog(
-                frame, IGuiConsts.ABOUT_TEXT, IGuiConsts.ABOUT_TITLE,
-                JOptionPane.INFORMATION_MESSAGE));
+                frame, IGuiConsts.ABOUT_TEXT.formatted(Main.appVersion),
+                IGuiConsts.ABOUT_TITLE, JOptionPane.INFORMATION_MESSAGE));
         var helpMenu = new JMenu(IGuiConsts.HELP);
         helpMenu.add(aboutItem);
         menuBar.add(helpMenu);
@@ -258,7 +259,7 @@ public class Gui {
     }
 
     private void createFrame() {
-        frame = CustomJFrame.create();
+        frame = CustomJFrame.create(Main.appName);
         frame.setJMenuBar(menuBar);
         frame.getContentPane().add(panelTable, BorderLayout.CENTER);
         frame.getContentPane().add(panelButton, BorderLayout.EAST);
