@@ -37,6 +37,7 @@ import home.db.DbInitializer;
 import home.db.dao.DaoSQLite;
 import home.gui.components.CustomJButton;
 import home.gui.components.CustomJFileChooser;
+import home.gui.components.CustomJFileChooser.ChooserOperation;
 import home.gui.components.CustomJFrame;
 import home.gui.components.CustomJPanel;
 import home.gui.components.CustomJPanel.PanelType;
@@ -44,6 +45,8 @@ import home.gui.components.CustomJTable;
 import home.gui.components.dialog.DialogCar;
 import home.gui.components.dialog.DialogMoto;
 import home.gui.components.dialog.DialogTruck;
+import home.gui.exception.SaveAsCancelException;
+import home.gui.exception.SaveAsToSameFileException;
 import home.models.AbstractVehicle;
 import home.utils.Utils;
 
@@ -164,7 +167,7 @@ public class Gui {
 
         btnDel = CustomJButton.create(IGuiConsts.DEL);
         btnDel.addActionListener(actionEvent -> {
-            Utils.ruInThread("delete action", () -> {
+            Utils.runInThread("delete action", () -> {
                 List<AbstractVehicle> objsMarkedForDel = Storage.INSTANCE.getAll().stream()
                         .filter(dataObj -> dataObj.isMarkedForDelete())
                         .collect(Collectors.toList());
@@ -189,30 +192,35 @@ public class Gui {
     }
 
     private void createMenu() {
-        var createOrOpenItime = new JMenuItem(IGuiConsts.CREATE_OR_OPEN);
-        createOrOpenItime.addActionListener(new CreateOrOpenActionListner(frame, dbLabel));
-        var saveItem = new JMenuItem(IGuiConsts.SAVE);
-        saveItem.addActionListener(new SaveActionListener(frame));
+        menuBar = new JMenuBar();
+
+        JMenuItem createOrOpenItime = createMenuItem(IGuiConsts.CREATE_OR_OPEN,
+                new CreateOrOpenActionListner(frame, dbLabel));
+        JMenuItem saveItem = createMenuItem(IGuiConsts.SAVE, new SaveActionListener(frame, dbLabel, false));
+        JMenuItem saveAsItem = createMenuItem(IGuiConsts.SAVE_AS, new SaveActionListener(frame, dbLabel, true));
         var fileMenu = new JMenu(IGuiConsts.FILE);
         fileMenu.add(createOrOpenItime);
         fileMenu.add(saveItem);
+        fileMenu.add(saveAsItem);
+        menuBar.add(fileMenu);
 
-        JMenu styleMenu = creatFilledStyleMenu();
+        menuBar.add(creatStyleMenu());
 
-        var aboutItem = new JMenuItem(IGuiConsts.ABOUT);
-        aboutItem.addActionListener(actionEvent -> JOptionPane.showMessageDialog(
+        JMenuItem aboutItem = createMenuItem(IGuiConsts.ABOUT, actionEvent -> JOptionPane.showMessageDialog(
                 frame, IGuiConsts.ABOUT_TEXT, IGuiConsts.ABOUT_TITLE,
                 JOptionPane.INFORMATION_MESSAGE));
         var helpMenu = new JMenu(IGuiConsts.HELP);
         helpMenu.add(aboutItem);
-
-        menuBar = new JMenuBar();
-        menuBar.add(fileMenu);
-        menuBar.add(styleMenu);
         menuBar.add(helpMenu);
     }
 
-    private JMenu creatFilledStyleMenu() {
+    private JMenuItem createMenuItem(String name, ActionListener listener) {
+        var menuItem = new JMenuItem(name);
+        menuItem.addActionListener(listener);
+        return menuItem;
+    }
+
+    private JMenu creatStyleMenu() {
         var styleMenu = new JMenu(IGuiConsts.STYLE);
         var checkBoxItems = new ArrayList<JCheckBoxMenuItem>();
         for (ColorSchema colorSchema : ColorSchema.values()) {
@@ -268,9 +276,9 @@ public class Gui {
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            Utils.ruInThread("create or open DB file", () -> {
+            Utils.runInThread("create or open DB file", () -> {
                 try {
-                    CustomJFileChooser.create(parent, IGuiConsts.CREATE_OR_OPEN).showChooser();
+                    CustomJFileChooser.createAndShowChooser(parent, ChooserOperation.CREATE_OR_OPEN);
                     DbInitializer.createTableIfNotExists();
                     Storage.INSTANCE.refresh(DaoSQLite.getInstance().readAll());
                     dbLabel.setText(Settings.DB_FILE_PATH);
@@ -280,7 +288,7 @@ public class Gui {
                     System.exit(1);
                 } catch (SQLException e) {
                     Utils.logAndShowError(LOG, parent, "Error while read selected DB file.\n"
-                            + e.getMessage(),
+                                    + e.getMessage(),
                             "Read selected DB error", e);
                     System.exit(1);
                 }
@@ -291,23 +299,39 @@ public class Gui {
     private static class SaveActionListener implements ActionListener {
 
         private final Component parent;
+        private final JLabel dbLabel;
+        private final boolean isSaveAs;
 
-        public SaveActionListener(Component parent) {
+        public SaveActionListener(Component parent, JLabel dbLabel, boolean isSaveAs) {
             this.parent = parent;
+            this.dbLabel = dbLabel;
+            this.isSaveAs = isSaveAs;
         }
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            Utils.ruInThread("save data to DB", () -> {
+            Utils.runInThread("save data to DB", () -> {
                 try {
-                    CustomJFileChooser.create(parent, IGuiConsts.SAVE).showChooser();
-                    DbInitializer.createTableIfNotExists();
-                    DaoSQLite.getInstance().saveAllChanges();
+                    if (isSaveAs) {
+                        try {
+                            CustomJFileChooser.createAndShowChooser(parent, ChooserOperation.SAVE_AS);
+                            DbInitializer.createTableIfNotExists();
+                            DaoSQLite.getInstance().saveAs();
+                        } catch (SaveAsToSameFileException e) {
+                            DaoSQLite.getInstance().saveAllChanges();
+                        } catch (SaveAsCancelException e) {
+                            // to do nothing.
+                        }
+                    } else {
+                        DaoSQLite.getInstance().saveAllChanges();
+                    }
                     Storage.INSTANCE.refresh(DaoSQLite.getInstance().readAll());
+                    dbLabel.setText(Settings.DB_FILE_PATH);
+                    JOptionPane.showMessageDialog(parent, IGuiConsts.SAVE_TEXT, IGuiConsts.SAVE_TITLE,
+                            JOptionPane.INFORMATION_MESSAGE);
                 } catch (IOException e) {
-                    Utils.logAndShowError(LOG, parent, "Error while create/open DB file.",
-                            "create/open DB file", e);
-                    System.exit(1);
+                    Utils.logAndShowError(LOG, parent, "Error while create/open db file.",
+                            "Create/open db file.", e);
                 } catch (SQLException e) {
                     Utils.logAndShowError(LOG, parent, "Error while read selected Db file.\n"
                             + e.getMessage(), "read selected DB file", e);

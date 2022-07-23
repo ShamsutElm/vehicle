@@ -8,8 +8,8 @@ import org.slf4j.LoggerFactory;
 import home.db.DbInitializer;
 import home.db.dao.DaoSQLite;
 import home.gui.Gui;
-import home.gui.IGuiConsts;
 import home.gui.components.CustomJFileChooser;
+import home.gui.components.CustomJFileChooser.ChooserOperation;
 import home.utils.Utils;
 
 public class Main {
@@ -24,7 +24,7 @@ public class Main {
             if (Settings.hasPathToDBFile()) {
                 initDB();
             } else {
-                CustomJFileChooser.create(null, IGuiConsts.CREATE_OR_OPEN).showChooser();
+                CustomJFileChooser.createAndShowChooser(null, ChooserOperation.CREATE_OR_OPEN);
                 initDB();
                 Gui.getInstance().setDBLabel(Settings.DB_FILE_PATH);
             }
@@ -49,7 +49,7 @@ public class Main {
     }
 
     private static void readDataFromDB() {
-        Utils.ruInThread("read data from DB", () -> {
+        Utils.runInThread("read data from DB", () -> {
             try {
                 Storage.INSTANCE.refresh(DaoSQLite.getInstance().readAll());
             } catch (Exception e) {
