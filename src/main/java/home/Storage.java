@@ -23,7 +23,7 @@ public enum Storage {
         dataObjIdsForUpdate.clear();
         dataObjsStorage.clear();
         dataObjsStorage.addAll(dataObjs);
-        Gui.getInstance().refreshTable();
+        Gui.INSTANCE.refreshTable();
     }
 
     public List<AbstractVehicle> getAll() {

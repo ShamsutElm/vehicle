@@ -31,8 +31,6 @@ public interface IGuiConsts {
     String SAVE = "Save";
     String SAVE_AS = "Save as...";
     String STYLE = "Style";
-    String DEFAULT = "Default";
-    String SYSTEM = "System";
     String HELP = "Help";
     String ABOUT = "About";
 

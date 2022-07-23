@@ -52,7 +52,9 @@ import home.gui.exception.SaveAsToSameFileException;
 import home.models.AbstractVehicle;
 import home.utils.Utils;
 
-public class Gui {
+public enum Gui {
+
+    INSTANCE;
 
     private static final Logger LOG = LoggerFactory.getLogger(Gui.class);
 
@@ -77,16 +79,6 @@ public class Gui {
     private JMenuBar menuBar;
 
     private JFrame frame;
-
-    private Gui() {
-    }
-
-    public static Gui getInstance() {
-        if (instance == null) {
-            instance = new Gui();
-        }
-        return instance;
-    }
 
     public void refreshTable() {
         tableModel.fireTableDataChanged();
@@ -175,7 +167,7 @@ public class Gui {
                         .collect(Collectors.toList());
                 if (!objsMarkedForDel.isEmpty()) {
                     Storage.INSTANCE.deleteObjects(objsMarkedForDel);
-                    Gui.getInstance().refreshTable();
+                    Gui.INSTANCE.refreshTable();
                 }
             });
         });

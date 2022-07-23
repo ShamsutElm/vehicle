@@ -8,7 +8,7 @@ import home.models.Car;
 import home.models.VehicleType;
 
 @SuppressWarnings("serial")
-public class DialogCar extends AbstractDialogTrailer {
+public final class DialogCar extends AbstractDialogTrailer {
 
     private JCheckBox chkPassengers;
 

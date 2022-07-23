@@ -26,7 +26,7 @@ import home.models.Truck;
 import home.models.VehicleType;
 import home.utils.Utils;
 
-public abstract class AbstractDao implements IDao {
+abstract class AbstractDao implements IDao {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractDao.class);
 
@@ -183,7 +183,7 @@ public abstract class AbstractDao implements IDao {
     }
 
     private void operation(Consumer<List<AbstractVehicle>> sqlOperation,
-                           Predicate<AbstractVehicle> objFilter) {
+            Predicate<AbstractVehicle> objFilter) {
         List<AbstractVehicle> objs = Storage.INSTANCE.getAll().stream()
                 .filter(objFilter).collect(Collectors.toList());
         if (!objs.isEmpty()) {
@@ -281,12 +281,13 @@ public abstract class AbstractDao implements IDao {
     private void checkConnectionState(SQLException e, String errorMsg) throws SQLException {
         String sqlState = e.getSQLState();
         if (sqlState.startsWith(CONNECTION_ERROR_CODE)) {
-            throw Utils.logAndCreateSqlException("%s:\nConnection error (code %s)".formatted(errorMsg, sqlState), getLogger());
+            throw Utils.logAndCreateSqlException("%s:\nConnection error (code %s)".formatted(errorMsg, sqlState),
+                    getLogger());
         }
     }
 
     private void sqlOperationOneByOne(Connection conn, String sql, List<AbstractVehicle> dataObjs,
-                                      boolean isUpdateOperation, String errorMsg) throws SQLException {
+            boolean isUpdateOperation, String errorMsg) throws SQLException {
         String operationType = isUpdateOperation ? "update" : "insert";
 
         Exception mainException = null;
@@ -314,7 +315,7 @@ public abstract class AbstractDao implements IDao {
     }
 
     private void fillStmtByDataFromObj(PreparedStatement pstmt, AbstractVehicle dataObj,
-                                       boolean isUpdateOperation) throws SQLException {
+            boolean isUpdateOperation) throws SQLException {
         VehicleType dataObjType = dataObj.getType();
 
         pstmt.setString(1, dataObjType.getType());

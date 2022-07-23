@@ -11,7 +11,7 @@ import home.gui.Gui;
 import home.gui.components.CustomJFileChooser;
 import home.utils.Utils;
 
-class Data {
+final class Data {
 
     private static final Logger LOG = LoggerFactory.getLogger(Data.class);
 
@@ -22,7 +22,7 @@ class Data {
             try {
                 CustomJFileChooser.createAndShowChooser(null, CustomJFileChooser.ChooserOperation.CREATE_OR_OPEN);
                 readDataFromDB();
-                Gui.getInstance().setDBLabel(Settings.getDbFilePath());
+                Gui.INSTANCE.setDBLabel(Settings.getDbFilePath());
             } catch (Exception e) {
                 throw new IllegalStateException("Error while create/open DB file", e);
             }

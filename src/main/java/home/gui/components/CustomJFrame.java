@@ -6,7 +6,7 @@ import java.awt.Dimension;
 import javax.swing.JFrame;
 
 @SuppressWarnings("serial")
-public class CustomJFrame extends JFrame {
+public final class CustomJFrame extends JFrame {
 
     private static final int GAP = 2;
 

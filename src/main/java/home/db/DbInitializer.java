@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import home.Settings;
 import home.Settings.Setting;
 
-public class DbInitializer {
+public final class DbInitializer {
 
     private static final Logger LOG = LoggerFactory.getLogger(DbInitializer.class);
 

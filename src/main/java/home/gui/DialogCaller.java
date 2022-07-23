@@ -16,7 +16,7 @@ import home.models.AbstractVehicle;
 import home.models.VehicleType;
 import home.utils.Utils;
 
-public class DialogCaller {
+public final class DialogCaller {
 
     private static final Logger LOG = LoggerFactory.getLogger(DialogCaller.class);
 
@@ -27,7 +27,7 @@ public class DialogCaller {
             AbstractVehicle dataObj, int tblRowOfSelectedDataObj) {
         try {
             Constructor<T> constructor = dialogClass.getConstructor(
-                    new Class[] { int.class, int.class, AbstractVehicle.class, int.class });
+                    new Class[]{int.class, int.class, AbstractVehicle.class, int.class});
             T dialog = constructor.newInstance(
                     OBJ_DIALOG_WIDTH, OBJ_DIALOG_HEIGHT, dataObj, tblRowOfSelectedDataObj);
             dialog.buildDialog();

@@ -7,7 +7,7 @@ import javax.swing.table.TableColumn;
 import home.Storage;
 
 @SuppressWarnings("serial")
-public class CustomJTable extends JTable {
+public final class CustomJTable extends JTable {
 
     private static final int TYPE_MIN_WIDTH = 100;
     private static final int COLOR_MIN_WIDTH = 50;

@@ -10,7 +10,7 @@ import javax.swing.JOptionPane;
 
 import org.slf4j.Logger;
 
-public class Utils {
+public final class Utils {
 
     // location of the log files is configured in file 'log4j2.xml'
     private static final Path LOG_FILE = Paths.get("logs", "app.log");
@@ -49,7 +49,7 @@ public class Utils {
         }
 
         log.error(errorMsg, e);
-        return new SQLException(errorMsg,e);
+        return new SQLException(errorMsg, e);
     }
 
     public static IllegalStateException logAndCreateIllegalStateException(String errorMsg, Logger log, Exception e) {

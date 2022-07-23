@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import home.gui.Gui;
 import home.utils.Utils;
 
-public class Main {
+public final class Main {
 
     private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
@@ -40,7 +40,7 @@ public class Main {
 
         initAppDescription();
         Settings.readSettings();
-        Gui.getInstance().buildGui();
+        Gui.INSTANCE.buildGui();
 
         Data.initDB();
     }

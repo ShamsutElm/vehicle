@@ -16,7 +16,7 @@ import home.gui.exception.SaveAsCancelException;
 import home.gui.exception.SaveAsToSameFileException;
 
 @SuppressWarnings("serial")
-public class CustomJFileChooser extends JFileChooser {
+public final class CustomJFileChooser extends JFileChooser {
 
     public static enum ChooserOperation {
 

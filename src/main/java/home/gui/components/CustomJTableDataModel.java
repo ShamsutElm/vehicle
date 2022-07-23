@@ -9,7 +9,7 @@ import home.gui.IGuiConsts;
 import home.models.AbstractVehicle;
 
 @SuppressWarnings("serial")
-public class CustomJTableDataModel extends AbstractTableModel {
+final class CustomJTableDataModel extends AbstractTableModel {
 
     private static final int COLUMNS_COUNT = 5;
 
@@ -38,18 +38,18 @@ public class CustomJTableDataModel extends AbstractTableModel {
     @Override
     public String getColumnName(int column) {
         switch (column) {
-        case TYPE_COL_IDX:
-            return IGuiConsts.TYPE;
-        case COLOR_COL_IDX:
-            return IGuiConsts.COLOR;
-        case NUMBER_COL_IDX:
-            return IGuiConsts.NUMBER;
-        case DATE_COL_IDX:
-            return IGuiConsts.DATE;
-        case DEL_MARK_COL_IDX:
-            return IGuiConsts.DELETION_MARK;
-        default:
-            return "";
+            case TYPE_COL_IDX:
+                return IGuiConsts.TYPE;
+            case COLOR_COL_IDX:
+                return IGuiConsts.COLOR;
+            case NUMBER_COL_IDX:
+                return IGuiConsts.NUMBER;
+            case DATE_COL_IDX:
+                return IGuiConsts.DATE;
+            case DEL_MARK_COL_IDX:
+                return IGuiConsts.DELETION_MARK;
+            default:
+                return "";
         }
     }
 
@@ -57,18 +57,18 @@ public class CustomJTableDataModel extends AbstractTableModel {
     public Object getValueAt(int rowIndex, int columnIndex) {
         AbstractVehicle dataObj = dataObjs.get(rowIndex);
         switch (columnIndex) {
-        case TYPE_COL_IDX:
-            return dataObj.getType();
-        case COLOR_COL_IDX:
-            return dataObj.getColor();
-        case NUMBER_COL_IDX:
-            return dataObj.getNumber();
-        case DATE_COL_IDX:
-            return IGuiConsts.DATE_FORMAT.format(new Date(dataObj.getDateTime()));
-        case DEL_MARK_COL_IDX:
-            return dataObj.isMarkedForDelete();
-        default:
-            return "";
+            case TYPE_COL_IDX:
+                return dataObj.getType();
+            case COLOR_COL_IDX:
+                return dataObj.getColor();
+            case NUMBER_COL_IDX:
+                return dataObj.getNumber();
+            case DATE_COL_IDX:
+                return IGuiConsts.DATE_FORMAT.format(new Date(dataObj.getDateTime()));
+            case DEL_MARK_COL_IDX:
+                return dataObj.isMarkedForDelete();
+            default:
+                return "";
         }
     }
 

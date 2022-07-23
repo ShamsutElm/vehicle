@@ -9,7 +9,7 @@ import java.util.Properties;
 
 import home.gui.ColorSchema;
 
-public class Settings {
+public final class Settings {
 
     public enum Setting {
 

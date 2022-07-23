@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import home.db.Connector;
 
-public class DaoSQLite extends AbstractDao {
+public final class DaoSQLite extends AbstractDao {
 
     private static final Logger LOG = LoggerFactory.getLogger(DaoSQLite.class);
 
