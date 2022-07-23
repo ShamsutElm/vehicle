@@ -26,7 +26,7 @@ public class Connector {
     private static final String URL_SQLITE = "jdbc:sqlite:%s";
 
     public static Connection getConnetionToPostgreSQL(String host, String port, String dbName,
-                                                      String user, String password) throws SQLException {
+            String user, String password) throws SQLException {
         String url = generetePostgreSqlUrl(host, port, dbName);
 
         var props = new Properties();
@@ -38,10 +38,10 @@ public class Connector {
         props.setProperty("cancelSignalTimeout", QUERY_TIMEOUT);
         props.setProperty("socketTimeout", QUERY_TIMEOUT);
 
-        return  getConnetion(url, props, JDBC_DRIVER_POSTGRESQL);
+        return getConnetion(url, props, JDBC_DRIVER_POSTGRESQL);
     }
 
-    private static  String generetePostgreSqlUrl(String host, String port, String dbName) {
+    private static String generetePostgreSqlUrl(String host, String port, String dbName) {
         String db;
         try {
             db = URLEncoder.encode(dbName, "UTF-8");
@@ -53,7 +53,7 @@ public class Connector {
     }
 
     public static Connection getConnetionToSQLite() throws SQLException {
-        return getConnetion(String.format(URL_SQLITE, Settings.DB_FILE_PATH), new Properties(), JDBC_DRIVER_SQLITE);
+        return getConnetion(String.format(URL_SQLITE, Settings.getDbFilePath()), new Properties(), JDBC_DRIVER_SQLITE);
     }
 
     private static Connection getConnetion(String url, Properties props, String jdbcDriver) throws SQLException {
@@ -65,7 +65,7 @@ public class Connector {
 
             return DriverManager.getConnection(url, props);
         } catch (ClassNotFoundException e) {
-           throw Utils.logAndCreateSqlException("Database driver is not found", LOG, e);
+            throw Utils.logAndCreateSqlException("Database driver is not found", LOG, e);
         } catch (SQLException e) {
             throw Utils.logAndCreateSqlException("Error while connecting to the database", LOG, e);
         }

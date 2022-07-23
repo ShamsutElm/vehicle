@@ -15,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import home.Settings;
+import home.Settings.Setting;
 import home.Storage;
 import home.db.dao.DaoSQLite;
 import home.models.AbstractVehicle;
@@ -98,7 +99,7 @@ public class DbTest {
     public void removeTemporaryDbFile() {
         try {
             Files.deleteIfExists(generetedDbFile.toPath());
-            Settings.writeSettings(Settings.DB_FILE_PATH_SETTING_NAME, "");
+            Settings.writeSetting(Setting.DB_FILE_PATH, "");
         } catch (IOException e) {
             fail("Error while delete DB file.", e);
         }

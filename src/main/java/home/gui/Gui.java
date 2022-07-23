@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import home.Settings;
+import home.Settings.Setting;
 import home.Storage;
 import home.db.DbInitializer;
 import home.db.dao.DaoSQLite;
@@ -95,7 +96,7 @@ public class Gui {
     }
 
     public void buildGui() {
-        setStyle(Settings.STYLE);
+        setStyle(Settings.getStyle());
 
         createTable();
         createButtons();
@@ -114,7 +115,7 @@ public class Gui {
         } catch (Exception e) {
             try {
                 UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-                Settings.writeSettings(Settings.STYLE_SETTING_NAME,
+                Settings.writeSetting(Setting.STYLE,
                         ColorSchema.CROSSPLATFORM.name().toLowerCase(Locale.ROOT));
                 Utils.logAndShowError(LOG, frame,
                         "Error while set the system color schema.\n"
@@ -132,7 +133,7 @@ public class Gui {
     }
 
     private void createTable() {
-        dbLabel = new JLabel(Settings.hasPathToDBFile() ? Settings.DB_FILE_PATH
+        dbLabel = new JLabel(Settings.hasPathToDBFile() ? Settings.getDbFilePath()
                 : IGuiConsts.CHOOSE_DB_FILE);
 
         table = CustomJTable.create();
@@ -232,7 +233,7 @@ public class Gui {
     private JCheckBoxMenuItem createCheckBoxMenuItem(ColorSchema colorSchema,
             List<JCheckBoxMenuItem> checkBoxItems) {
         var checkBoxMenuItem = new JCheckBoxMenuItem(colorSchema.getNameForGui());
-        checkBoxMenuItem.setSelected(colorSchema.name().equalsIgnoreCase(Settings.STYLE));
+        checkBoxMenuItem.setSelected(colorSchema.name().equalsIgnoreCase(Settings.getStyle()));
         checkBoxItems.add(checkBoxMenuItem);
         checkBoxMenuItem.addActionListener(actionEvent -> styleSelectAction(actionEvent, checkBoxItems));
         return checkBoxMenuItem;
@@ -246,10 +247,10 @@ public class Gui {
             var selectedItem = (JCheckBoxMenuItem) actionEvent.getSource();
             selectedItem.setSelected(true);
 
-            Settings.writeSettings(Settings.STYLE_SETTING_NAME,
+            Settings.writeSetting(Setting.STYLE,
                     selectedItem.getText().toLowerCase(Locale.ROOT));
 
-            setStyle(Settings.STYLE);
+            setStyle(Settings.getStyle());
             SwingUtilities.updateComponentTreeUI(frame);
         } catch (Exception e) {
             Utils.logAndShowError(LOG, frame, "Error while chose style", "Style error", e);
@@ -281,7 +282,7 @@ public class Gui {
                     CustomJFileChooser.createAndShowChooser(parent, ChooserOperation.CREATE_OR_OPEN);
                     DbInitializer.createTableIfNotExists();
                     Storage.INSTANCE.refresh(DaoSQLite.getInstance().readAll());
-                    dbLabel.setText(Settings.DB_FILE_PATH);
+                    dbLabel.setText(Settings.getDbFilePath());
                 } catch (IOException e) {
                     Utils.logAndShowError(LOG, parent, "Error while create/open DB file.",
                             "Create/Open file error", e);
@@ -326,7 +327,7 @@ public class Gui {
                         DaoSQLite.getInstance().saveAllChanges();
                     }
                     Storage.INSTANCE.refresh(DaoSQLite.getInstance().readAll());
-                    dbLabel.setText(Settings.DB_FILE_PATH);
+                    dbLabel.setText(Settings.getDbFilePath());
                     JOptionPane.showMessageDialog(parent, IGuiConsts.SAVE_TEXT, IGuiConsts.SAVE_TITLE,
                             JOptionPane.INFORMATION_MESSAGE);
                 } catch (IOException e) {

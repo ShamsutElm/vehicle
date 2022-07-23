@@ -26,7 +26,7 @@ public class Main {
             } else {
                 CustomJFileChooser.createAndShowChooser(null, ChooserOperation.CREATE_OR_OPEN);
                 initDB();
-                Gui.getInstance().setDBLabel(Settings.DB_FILE_PATH);
+                Gui.getInstance().setDBLabel(Settings.getDbFilePath());
             }
 
             LOG.info("Приложение успешно запущенно.");
