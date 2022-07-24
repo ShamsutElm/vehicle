@@ -6,7 +6,7 @@
 | ------- | ----------- |
 | 1.0.0 | work with one internal db |
 | 2.0.0 | db chooser |
-| 3.0.0 | save data wfter push button |
+| 3.0.0 | save data after push button |
 | 4.0.0 | improve and refactoring |
 
 ## Plans
