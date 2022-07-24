@@ -1,13 +1,10 @@
 package home.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -35,11 +32,7 @@ import home.Main;
 import home.Settings;
 import home.Settings.Setting;
 import home.Storage;
-import home.db.DbInitializer;
-import home.db.dao.DaoSQLite;
 import home.gui.components.CustomJButton;
-import home.gui.components.CustomJFileChooser;
-import home.gui.components.CustomJFileChooser.ChooserOperation;
 import home.gui.components.CustomJFrame;
 import home.gui.components.CustomJPanel;
 import home.gui.components.CustomJPanel.PanelType;
@@ -47,8 +40,8 @@ import home.gui.components.CustomJTable;
 import home.gui.components.dialog.DialogCar;
 import home.gui.components.dialog.DialogMoto;
 import home.gui.components.dialog.DialogTruck;
-import home.gui.exception.SaveAsCancelException;
-import home.gui.exception.SaveAsToSameFileException;
+import home.gui.listener.CreateOrOpenActionListener;
+import home.gui.listener.SaveActionListener;
 import home.models.AbstractVehicle;
 import home.utils.Utils;
 
@@ -189,9 +182,9 @@ public enum Gui {
         menuBar = new JMenuBar();
 
         JMenuItem createOrOpenItime = createMenuItem(IGuiConsts.CREATE_OR_OPEN,
-                new CreateOrOpenActionListner(frame, dbLabel));
-        JMenuItem saveItem = createMenuItem(IGuiConsts.SAVE, new SaveActionListener(frame, dbLabel, false));
-        JMenuItem saveAsItem = createMenuItem(IGuiConsts.SAVE_AS, new SaveActionListener(frame, dbLabel, true));
+                new CreateOrOpenActionListener(frame, dbLabel, LOG));
+        JMenuItem saveItem = createMenuItem(IGuiConsts.SAVE, new SaveActionListener(frame, dbLabel, false, LOG));
+        JMenuItem saveAsItem = createMenuItem(IGuiConsts.SAVE_AS, new SaveActionListener(frame, dbLabel, true, LOG));
         var fileMenu = new JMenu(IGuiConsts.FILE);
         fileMenu.add(createOrOpenItime);
         fileMenu.add(saveItem);
@@ -256,82 +249,5 @@ public enum Gui {
         frame.getContentPane().add(panelTable, BorderLayout.CENTER);
         frame.getContentPane().add(panelButton, BorderLayout.EAST);
         frame.setVisible(true);
-    }
-
-    private static final class CreateOrOpenActionListner implements ActionListener {
-
-        private final Component parent;
-        private final JLabel dbLabel;
-
-        public CreateOrOpenActionListner(Component parent, JLabel dbLabel) {
-            this.parent = parent;
-            this.dbLabel = dbLabel;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent event) {
-            Utils.runInThread("-> create or open DB file", () -> {
-                try {
-                    CustomJFileChooser.createAndShowChooser(parent, ChooserOperation.CREATE_OR_OPEN);
-                    DbInitializer.createTableIfNotExists();
-                    Storage.INSTANCE.refresh(DaoSQLite.getInstance().readAll());
-                    dbLabel.setText(Settings.getDbFilePath());
-                } catch (IOException e) {
-                    Utils.logAndShowError(LOG, parent, "Error while create/open DB file.",
-                            "Create/Open file error", e);
-                    System.exit(1);
-                } catch (SQLException e) {
-                    Utils.logAndShowError(LOG, parent, "Error while read selected DB file.\n"
-                                    + e.getMessage(),
-                            "Read selected DB error", e);
-                    System.exit(1);
-                }
-            });
-        }
-    }
-
-    private static class SaveActionListener implements ActionListener {
-
-        private final Component parent;
-        private final JLabel dbLabel;
-        private final boolean isSaveAs;
-
-        public SaveActionListener(Component parent, JLabel dbLabel, boolean isSaveAs) {
-            this.parent = parent;
-            this.dbLabel = dbLabel;
-            this.isSaveAs = isSaveAs;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent event) {
-            Utils.runInThread("-> save data to DB", () -> {
-                try {
-                    if (isSaveAs) {
-                        try {
-                            CustomJFileChooser.createAndShowChooser(parent, ChooserOperation.SAVE_AS);
-                            DbInitializer.createTableIfNotExists();
-                            DaoSQLite.getInstance().saveAs();
-                        } catch (SaveAsToSameFileException e) {
-                            DaoSQLite.getInstance().saveAllChanges();
-                        } catch (SaveAsCancelException e) {
-                            // to do nothing.
-                        }
-                    } else {
-                        DaoSQLite.getInstance().saveAllChanges();
-                    }
-                    Storage.INSTANCE.refresh(DaoSQLite.getInstance().readAll());
-                    dbLabel.setText(Settings.getDbFilePath());
-                    JOptionPane.showMessageDialog(parent, IGuiConsts.SAVE_TEXT, IGuiConsts.SAVE_TITLE,
-                            JOptionPane.INFORMATION_MESSAGE);
-                } catch (IOException e) {
-                    Utils.logAndShowError(LOG, parent, "Error while create/open db file.",
-                            "Create/open db file.", e);
-                } catch (SQLException e) {
-                    Utils.logAndShowError(LOG, parent, "Error while read selected Db file.\n"
-                            + e.getMessage(), "read selected DB file", e);
-                    System.exit(1);
-                }
-            });
-        }
     }
 }
