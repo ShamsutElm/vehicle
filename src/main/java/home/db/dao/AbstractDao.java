@@ -24,7 +24,7 @@ import home.models.Car;
 import home.models.Motorcycle;
 import home.models.Truck;
 import home.models.VehicleType;
-import home.utils.Utils;
+import home.utils.LogUtils;
 
 abstract class AbstractDao implements IDao {
 
@@ -261,11 +261,11 @@ abstract class AbstractDao implements IDao {
 
             if (Statement.EXECUTE_FAILED == batchResalt) {
                 msg.append("result code 'EXECUTE_FAILED' was received.");
-                throw Utils.logAndCreateSqlException(msg.toString(), log);
+                throw LogUtils.logAndCreateSqlException(msg.toString(), log);
             }
 
             msg.append("Unknown result code ").append(batchResalt).append(" was received.");
-            throw Utils.logAndCreateSqlException(msg.toString(), log);
+            throw LogUtils.logAndCreateSqlException(msg.toString(), log);
         }
     }
 
@@ -274,14 +274,14 @@ abstract class AbstractDao implements IDao {
         try {
             conn.rollback();
         } catch (SQLException ex) {
-            throw Utils.logAndCreateIllegalStateException(errorMsg + " SQL rollback error.", LOG, e);
+            throw LogUtils.logAndCreateIllegalStateException(errorMsg + " SQL rollback error.", LOG, e);
         }
     }
 
     private void checkConnectionState(SQLException e, String errorMsg) throws SQLException {
         String sqlState = e.getSQLState();
         if (sqlState.startsWith(CONNECTION_ERROR_CODE)) {
-            throw Utils.logAndCreateSqlException("%s:\nConnection error (code %s)".formatted(errorMsg, sqlState),
+            throw LogUtils.logAndCreateSqlException("%s:\nConnection error (code %s)".formatted(errorMsg, sqlState),
                     getLogger());
         }
     }
@@ -310,7 +310,7 @@ abstract class AbstractDao implements IDao {
             sb.append(errorMsg).append(" Can't ").append(operationType).append(": \n")
                     .append(String.join("\n", errorsWithDataObjs));
 
-            throw Utils.logAndCreateSqlException(sb.toString(), LOG, mainException);
+            throw LogUtils.logAndCreateSqlException(sb.toString(), LOG, mainException);
         }
     }
 
@@ -401,7 +401,7 @@ abstract class AbstractDao implements IDao {
                     .append("\nCan't delete objects with ids:\n")
                     .append(String.join("\n", errorsWithIds));
 
-            throw Utils.logAndCreateSqlException(sb.toString(), LOG, mainException);
+            throw LogUtils.logAndCreateSqlException(sb.toString(), LOG, mainException);
         }
     }
 

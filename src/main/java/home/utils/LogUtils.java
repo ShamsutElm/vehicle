@@ -10,7 +10,7 @@ import javax.swing.JOptionPane;
 
 import org.slf4j.Logger;
 
-public final class Utils {
+public final class LogUtils {
 
     // location of the log files is configured in file 'log4j2.xml'
     private static final Path LOG_FILE = Paths.get("logs", "app.log");
@@ -50,6 +50,6 @@ public final class Utils {
         return new IllegalStateException(errorMsg, e);
     }
 
-    private Utils() {
+    private LogUtils() {
     }
 }

@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import home.gui.Gui;
-import home.utils.Utils;
+import home.utils.LogUtils;
 
 public final class Main {
 
@@ -27,7 +27,7 @@ public final class Main {
             isStarted = true;
             LOG.info("Application {} v{} started successfully.", appName, appVersion);
         } catch (Exception e) {
-            Utils.logAndShowError(LOG, null, e.getMessage(), "Application start error", e);
+            LogUtils.logAndShowError(LOG, null, e.getMessage(), "Application start error", e);
         } finally {
             if (!isStarted) {
                 System.exit(1);
@@ -49,7 +49,7 @@ public final class Main {
         var handler = new UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread t, Throwable e) {
-                Utils.logAndShowError(LOG, null, e.getMessage(), "Error", e);
+                LogUtils.logAndShowError(LOG, null, e.getMessage(), "Error", e);
                 System.exit(1);
             }
         };

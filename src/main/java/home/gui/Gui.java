@@ -43,8 +43,8 @@ import home.gui.components.dialog.DialogTruck;
 import home.gui.listener.CreateOrOpenActionListener;
 import home.gui.listener.SaveActionListener;
 import home.models.AbstractVehicle;
+import home.utils.LogUtils;
 import home.utils.ThreadUtils;
-import home.utils.Utils;
 
 public enum Gui {
 
@@ -104,7 +104,7 @@ public enum Gui {
                 UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
                 Settings.writeSetting(Setting.STYLE,
                         ColorSchema.CROSSPLATFORM.name().toLowerCase(Locale.ROOT));
-                Utils.logAndShowError(LOG, frame,
+                LogUtils.logAndShowError(LOG, frame,
                         "Error while set the system color schema.\n"
                                 + ColorSchema.CROSSPLATFORM.getNameForGui()
                                 + " color schema will be used.\n"
@@ -112,7 +112,7 @@ public enum Gui {
                         "System color schema error", e);
             } catch (Exception ex) {
                 JFrame.setDefaultLookAndFeelDecorated(true);
-                Utils.logAndShowError(LOG, frame,
+                LogUtils.logAndShowError(LOG, frame,
                         "Error while set Default color schema.\n" + ex.getMessage(),
                         "System color schema error", ex);
             }
@@ -240,7 +240,7 @@ public enum Gui {
             setStyle(Settings.getStyle());
             SwingUtilities.updateComponentTreeUI(frame);
         } catch (Exception e) {
-            Utils.logAndShowError(LOG, frame, "Error while chose style", "Style error", e);
+            LogUtils.logAndShowError(LOG, frame, "Error while chose style", "Style error", e);
         }
     }
 

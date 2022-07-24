@@ -14,7 +14,7 @@ import home.gui.components.dialog.DialogMoto;
 import home.gui.components.dialog.DialogTruck;
 import home.models.AbstractVehicle;
 import home.models.VehicleType;
-import home.utils.Utils;
+import home.utils.LogUtils;
 
 public final class DialogCaller {
 
@@ -32,7 +32,7 @@ public final class DialogCaller {
                     OBJ_DIALOG_WIDTH, OBJ_DIALOG_HEIGHT, dataObj, tblRowOfSelectedDataObj);
             dialog.buildDialog();
         } catch (Exception e) {
-            Utils.logAndShowError(LOG, frame, "Ошибка создания диалогового окна.\n"
+            LogUtils.logAndShowError(LOG, frame, "Ошибка создания диалогового окна.\n"
                     + e.getMessage(), "Ошибка диалогового окна", e);
         }
     }
@@ -60,7 +60,7 @@ public final class DialogCaller {
                 break;
 
             default:
-                Utils.logAndShowError(LOG, frame, "Нет диологового окна для [" + objtType + ']',
+                LogUtils.logAndShowError(LOG, frame, "Нет диологового окна для [" + objtType + ']',
                         "Ошибка типа диологового окна",
                         new IllegalAccessException("Ошибка типа диологового окна"));
                 return;

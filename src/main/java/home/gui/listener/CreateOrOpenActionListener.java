@@ -15,8 +15,8 @@ import home.db.DbInitializer;
 import home.db.dao.DaoSQLite;
 import home.gui.DataActionInGui;
 import home.gui.components.CustomJFileChooser;
+import home.utils.LogUtils;
 import home.utils.ThreadUtils;
-import home.utils.Utils;
 
 public final class CreateOrOpenActionListener implements ActionListener {
 
@@ -40,11 +40,11 @@ public final class CreateOrOpenActionListener implements ActionListener {
                 DataActionInGui.init(DaoSQLite.getInstance().readAll());
                 dbLabel.setText(Settings.getDbFilePath());
             } catch (IOException e) {
-                Utils.logAndShowError(log, parent, "Error while create/open DB file.",
+                LogUtils.logAndShowError(log, parent, "Error while create/open DB file.",
                         "Create/Open file error", e);
                 System.exit(1);
             } catch (SQLException e) {
-                Utils.logAndShowError(log, parent, "Error while read selected DB file.\n"
+                LogUtils.logAndShowError(log, parent, "Error while read selected DB file.\n"
                                 + e.getMessage(),
                         "Read selected DB error", e);
                 System.exit(1);

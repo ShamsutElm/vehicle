@@ -19,8 +19,8 @@ import home.gui.IGuiConsts;
 import home.gui.components.CustomJFileChooser;
 import home.gui.exception.SaveAsCancelException;
 import home.gui.exception.SaveAsToSameFileException;
+import home.utils.LogUtils;
 import home.utils.ThreadUtils;
-import home.utils.Utils;
 
 public final class SaveActionListener implements ActionListener {
 
@@ -60,10 +60,10 @@ public final class SaveActionListener implements ActionListener {
                 JOptionPane.showMessageDialog(parent, IGuiConsts.SAVE_TEXT, IGuiConsts.SAVE_TITLE,
                         JOptionPane.INFORMATION_MESSAGE);
             } catch (IOException e) {
-                Utils.logAndShowError(log, parent, "Error while create/open db file.",
+                LogUtils.logAndShowError(log, parent, "Error while create/open db file.",
                         "Create/open db file.", e);
             } catch (SQLException e) {
-                Utils.logAndShowError(log, parent, "Error while read selected Db file.\n"
+                LogUtils.logAndShowError(log, parent, "Error while read selected Db file.\n"
                         + e.getMessage(), "read selected DB file", e);
                 System.exit(1);
             }

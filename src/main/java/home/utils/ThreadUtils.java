@@ -70,7 +70,7 @@ public final class ThreadUtils {
                             + " tasks will not be executed.");
                 }
             } catch (InterruptedException e) {
-                Utils.logAndShowError(LOG, null, "Interrupted the operation of stopping tasks",
+                LogUtils.logAndShowError(LOG, null, "Interrupted the operation of stopping tasks",
                         "Stopping tasks error", e);
                 Thread.currentThread().interrupt();
             }
