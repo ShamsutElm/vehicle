@@ -10,6 +10,7 @@ import home.db.dao.DaoSQLite;
 import home.gui.DataActionInGui;
 import home.gui.Gui;
 import home.gui.components.CustomJFileChooser;
+import home.utils.ThreadUtils;
 import home.utils.Utils;
 
 final class Data {
@@ -31,7 +32,8 @@ final class Data {
     }
 
     private static void readDataFromDB() {
-        Utils.runInThread("-> read data from DB", () -> {
+        ThreadUtils.runInThread(() -> {
+            Thread.currentThread().setName("-> read data from DB");
             try {
                 DbInitializer.createTableIfNotExists();
                 DataActionInGui.init(DaoSQLite.getInstance().readAll());

@@ -15,6 +15,7 @@ import home.db.DbInitializer;
 import home.db.dao.DaoSQLite;
 import home.gui.DataActionInGui;
 import home.gui.components.CustomJFileChooser;
+import home.utils.ThreadUtils;
 import home.utils.Utils;
 
 public final class CreateOrOpenActionListener implements ActionListener {
@@ -31,7 +32,8 @@ public final class CreateOrOpenActionListener implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent event) {
-        Utils.runInThread("-> create or open DB file", () -> {
+        ThreadUtils.runInThread(() -> {
+            Thread.currentThread().setName("-> create or open DB file");
             try {
                 CustomJFileChooser.createAndShowChooser(parent, CustomJFileChooser.ChooserOperation.CREATE_OR_OPEN);
                 DbInitializer.createTableIfNotExists();

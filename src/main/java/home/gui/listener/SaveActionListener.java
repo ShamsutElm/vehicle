@@ -19,6 +19,7 @@ import home.gui.IGuiConsts;
 import home.gui.components.CustomJFileChooser;
 import home.gui.exception.SaveAsCancelException;
 import home.gui.exception.SaveAsToSameFileException;
+import home.utils.ThreadUtils;
 import home.utils.Utils;
 
 public final class SaveActionListener implements ActionListener {
@@ -37,7 +38,8 @@ public final class SaveActionListener implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent event) {
-        Utils.runInThread("-> save data to DB", () -> {
+        ThreadUtils.runInThread(() -> {
+            Thread.currentThread().setName("-> save data to DB");
             try {
                 if (isSaveAs) {
                     try {

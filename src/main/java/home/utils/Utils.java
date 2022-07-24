@@ -15,13 +15,6 @@ public final class Utils {
     // location of the log files is configured in file 'log4j2.xml'
     private static final Path LOG_FILE = Paths.get("logs", "app.log");
 
-    public static void runInThread(String description, Runnable runnable) {
-        Thread thread = new Thread(runnable);
-        thread.setName(description);
-        thread.setDaemon(true);
-        thread.start();
-    }
-
     public static <T> void logAndShowError(Logger log, Component parentComponent, String msg,
             String title, Throwable t) {
         String threadName = "[THREAD: " + Thread.currentThread().getName() + ']';

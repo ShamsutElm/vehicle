@@ -43,6 +43,7 @@ import home.gui.components.dialog.DialogTruck;
 import home.gui.listener.CreateOrOpenActionListener;
 import home.gui.listener.SaveActionListener;
 import home.models.AbstractVehicle;
+import home.utils.ThreadUtils;
 import home.utils.Utils;
 
 public enum Gui {
@@ -154,7 +155,8 @@ public enum Gui {
 
         btnDel = CustomJButton.create(IGuiConsts.DEL);
         btnDel.addActionListener(actionEvent -> {
-            Utils.runInThread("-> delete action", () -> {
+            ThreadUtils.runInThread(() -> {
+                Thread.currentThread().setName("-> delete action");
                 List<AbstractVehicle> objsMarkedForDel = Storage.INSTANCE.getAll().stream()
                         .filter(dataObj -> dataObj.isMarkedForDelete())
                         .collect(Collectors.toList());
