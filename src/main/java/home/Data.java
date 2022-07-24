@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import home.db.DbInitializer;
 import home.db.dao.DaoSQLite;
+import home.gui.DataActionInGui;
 import home.gui.Gui;
 import home.gui.components.CustomJFileChooser;
 import home.utils.Utils;
@@ -30,20 +31,15 @@ final class Data {
     }
 
     private static void readDataFromDB() {
-        try {
-            DbInitializer.createTableIfNotExists();
-
-            Utils.runInThread("-> read data from DB", () -> {
-                try {
-                    Storage.INSTANCE.refresh(DaoSQLite.getInstance().readAll());
-                } catch (SQLException e) {
-                    Utils.logAndShowError(LOG, null, "Error while read data from DB: "
-                            + e.getMessage(), "Data reading error", e);
-                    throw new IllegalStateException("Error while read data from DB: " + e.getMessage(), e);
-                }
-            });
-        } catch (Exception e) {
-            throw new IllegalStateException("Error while read data from DB", e);
-        }
+        Utils.runInThread("-> read data from DB", () -> {
+            try {
+                DbInitializer.createTableIfNotExists();
+                DataActionInGui.init(DaoSQLite.getInstance().readAll());
+            } catch (SQLException e) {
+                String errorMsg = "Error while read data from DB: " + e.getMessage();
+                Utils.logAndShowError(LOG, null, errorMsg, "Data reading error", e);
+                throw new IllegalStateException(errorMsg, e);
+            }
+        });
     }
 }

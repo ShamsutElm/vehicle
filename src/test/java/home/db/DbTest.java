@@ -78,7 +78,7 @@ public class DbTest {
             cretedDataObj.setDateTime(System.currentTimeMillis());
             cretedDataObj.setTransportsPassengers(true);
 
-            Storage.INSTANCE.updateStorage(cretedDataObj, Storage.NO_ROW_IS_SELECTED);
+            Storage.INSTANCE.updateDataObj(cretedDataObj, Storage.NO_ROW_IS_SELECTED);
             DaoSQLite.getInstance().saveAllChanges();
 
             long id = 1;

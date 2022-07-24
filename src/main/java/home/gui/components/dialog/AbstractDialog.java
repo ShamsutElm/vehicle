@@ -11,8 +11,7 @@ import javax.swing.JTextField;
 
 import org.jdesktop.swingx.JXDatePicker;
 
-import home.Storage;
-import home.gui.Gui;
+import home.gui.DataActionInGui;
 import home.gui.IGuiConsts;
 import home.gui.components.CustomJButton;
 import home.gui.components.CustomJLabel;
@@ -96,8 +95,7 @@ public abstract class AbstractDialog extends AbstractCustomJDialog {
         btnOk.addActionListener(actionEvent -> {
             fillDataObj();
             if (isObjFilled()) {
-                Storage.INSTANCE.updateStorage(dataObj, tblRowOfSelectedDataObj);
-                Gui.INSTANCE.refreshTable();
+                DataActionInGui.update(dataObj, tblRowOfSelectedDataObj);
                 dispose();
             }
         });

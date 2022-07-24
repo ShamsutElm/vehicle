@@ -11,9 +11,9 @@ import javax.swing.JLabel;
 import org.slf4j.Logger;
 
 import home.Settings;
-import home.Storage;
 import home.db.DbInitializer;
 import home.db.dao.DaoSQLite;
+import home.gui.DataActionInGui;
 import home.gui.components.CustomJFileChooser;
 import home.utils.Utils;
 
@@ -35,7 +35,7 @@ public final class CreateOrOpenActionListener implements ActionListener {
             try {
                 CustomJFileChooser.createAndShowChooser(parent, CustomJFileChooser.ChooserOperation.CREATE_OR_OPEN);
                 DbInitializer.createTableIfNotExists();
-                Storage.INSTANCE.refresh(DaoSQLite.getInstance().readAll());
+                DataActionInGui.init(DaoSQLite.getInstance().readAll());
                 dbLabel.setText(Settings.getDbFilePath());
             } catch (IOException e) {
                 Utils.logAndShowError(log, parent, "Error while create/open DB file.",

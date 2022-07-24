@@ -159,8 +159,7 @@ public enum Gui {
                         .filter(dataObj -> dataObj.isMarkedForDelete())
                         .collect(Collectors.toList());
                 if (!objsMarkedForDel.isEmpty()) {
-                    Storage.INSTANCE.deleteObjects(objsMarkedForDel);
-                    Gui.INSTANCE.refreshTable();
+                    DataActionInGui.delete(objsMarkedForDel);
                 }
             });
         });

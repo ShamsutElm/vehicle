@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import home.gui.Gui;
 import home.models.AbstractVehicle;
 
 public enum Storage {
@@ -18,12 +17,15 @@ public enum Storage {
     private final Set<Long> dataObjIdsForDel = new HashSet<>();
     private final Set<Long> dataObjIdsForUpdate = new HashSet<>();
 
-    public void refresh(List<AbstractVehicle> dataObjs) {
+    public void initDataObjs(List<AbstractVehicle> dataObjs) {
         dataObjIdsForDel.clear();
         dataObjIdsForUpdate.clear();
         dataObjsStorage.clear();
         dataObjsStorage.addAll(dataObjs);
-        Gui.INSTANCE.refreshTable();
+    }
+
+    public void addDataObjs(List<AbstractVehicle> dataObjs) {
+        dataObjsStorage.addAll(dataObjs);
     }
 
     public List<AbstractVehicle> getAll() {
@@ -42,7 +44,7 @@ public enum Storage {
         return dataObjIdsForUpdate;
     }
 
-    public void updateStorage(AbstractVehicle dataObj, int tblRowOfSelectedDataObj) {
+    public void updateDataObj(AbstractVehicle dataObj, int tblRowOfSelectedDataObj) {
         if (NO_ROW_IS_SELECTED == tblRowOfSelectedDataObj) {
             dataObjsStorage.add(dataObj);
         } else {
@@ -51,7 +53,7 @@ public enum Storage {
         }
     }
 
-    public void deleteObjects(List<AbstractVehicle> objsMarkedForDel) {
+    public void deleteDataObjs(List<AbstractVehicle> objsMarkedForDel) {
         for (AbstractVehicle objForDel : objsMarkedForDel) {
             long idObjForDel = objForDel.getId();
             if (idObjForDel > 0) {

@@ -12,9 +12,9 @@ import javax.swing.JOptionPane;
 import org.slf4j.Logger;
 
 import home.Settings;
-import home.Storage;
 import home.db.DbInitializer;
 import home.db.dao.DaoSQLite;
+import home.gui.DataActionInGui;
 import home.gui.IGuiConsts;
 import home.gui.components.CustomJFileChooser;
 import home.gui.exception.SaveAsCancelException;
@@ -48,11 +48,12 @@ public final class SaveActionListener implements ActionListener {
                         DaoSQLite.getInstance().saveAllChanges();
                     } catch (SaveAsCancelException e) {
                         // to do nothing.
+                        return;
                     }
                 } else {
                     DaoSQLite.getInstance().saveAllChanges();
                 }
-                Storage.INSTANCE.refresh(DaoSQLite.getInstance().readAll());
+                DataActionInGui.init(DaoSQLite.getInstance().readAll());
                 dbLabel.setText(Settings.getDbFilePath());
                 JOptionPane.showMessageDialog(parent, IGuiConsts.SAVE_TEXT, IGuiConsts.SAVE_TITLE,
                         JOptionPane.INFORMATION_MESSAGE);
