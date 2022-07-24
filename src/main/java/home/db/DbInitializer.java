@@ -8,8 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import home.Settings;
+import home.Settings.Setting;
 
-public class DbInitializer {
+public final class DbInitializer {
 
     private static final Logger LOG = LoggerFactory.getLogger(DbInitializer.class);
 
@@ -29,7 +30,7 @@ public class DbInitializer {
             if (!file.exists()) {
                 file.createNewFile();
             }
-            Settings.writeSettings(Settings.DB_FILE_PATH_SETTING_NAME, file.getAbsolutePath());
+            Settings.writeSetting(Setting.DB_FILE_PATH, file.getAbsolutePath());
         } catch (IOException e) {
             LOG.error("Error while creating the DB file", e);
             throw e;
@@ -37,8 +38,8 @@ public class DbInitializer {
     }
 
     public static void createTableIfNotExists() throws SQLException {
-        try (var connection = Connector.getConnetion();
-                var stmt = connection.createStatement()) {
+        try (var connection = Connector.getConnetionToSQLite();
+             var stmt = connection.createStatement()) {
             stmt.execute(CREATE_TBL_QUERY);
         }
     }

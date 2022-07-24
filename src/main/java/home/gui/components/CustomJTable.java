@@ -7,7 +7,7 @@ import javax.swing.table.TableColumn;
 import home.Storage;
 
 @SuppressWarnings("serial")
-public class CustomJTable extends JTable {
+public final class CustomJTable extends JTable {
 
     private static final int TYPE_MIN_WIDTH = 100;
     private static final int COLOR_MIN_WIDTH = 50;
@@ -23,7 +23,7 @@ public class CustomJTable extends JTable {
 
     public static JTable create() {
         var tbl = new CustomJTable();
-        tbl.setModel(new CustomJTableDataModel(Storage.getInstance().getAll()));
+        tbl.setModel(new CustomJTableDataModel(Storage.INSTANCE.getAll()));
         tbl.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tbl.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 //        tbl.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);

@@ -1,42 +1,27 @@
 package home.utils;
 
-import java.awt.Component;
-import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+import java.util.TimeZone;
 
-import javax.swing.JOptionPane;
+import home.gui.IGuiConsts;
 
-import org.slf4j.Logger;
+public final class Utils {
 
-public class Utils {
-
-    public static void ruInThread(String description, Runnable runnable) {
-        Thread thread = new Thread(runnable);
-        thread.setName(description);
-        thread.setDaemon(true);
-        thread.start();
+    public static String getFormatedDate(long dataTimeInMilliseconds) {
+        LocalDateTime dateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(dataTimeInMilliseconds),
+                TimeZone.getDefault().toZoneId());
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(IGuiConsts.DATE_FORMAT, Locale.ROOT);
+        return dateTime.format(dateFormatter);
     }
 
-    public static String idsToString(Long[] ids) {
-        var sb = new StringBuilder("(");
-        for (Long id : ids) {
-            sb.append(id).append(',');
-        }
-        sb.setLength(sb.length() - 1);
-        sb.append(')');
-        return sb.toString();
-    }
-
-    public static <T> void logAndShowError(Logger log, Component parent, String msg,
-            String title, Exception e) {
-        log.error("Exception: ", e);
-        JOptionPane.showMessageDialog(parent, msg + "\n\nDescription.\n" + e.getMessage(),
-                title, JOptionPane.ERROR_MESSAGE);
-    }
-
-    public static IOException getNewException(Exception e, String msg) {
-        var ex = new IOException(msg);
-        ex.addSuppressed(e);
-        return ex;
+    public static long getLongFromFormattedDate(String formattedDate) {
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(IGuiConsts.DATE_FORMAT, Locale.ROOT);
+        long millisecondsSinceEpoch = LocalDateTime.parse(formattedDate, dateFormatter)
+                .atZone(TimeZone.getDefault().toZoneId()).toInstant().toEpochMilli();
+        return millisecondsSinceEpoch;
     }
 
     private Utils() {

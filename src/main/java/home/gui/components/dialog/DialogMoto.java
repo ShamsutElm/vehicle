@@ -8,7 +8,7 @@ import home.models.Motorcycle;
 import home.models.VehicleType;
 
 @SuppressWarnings("serial")
-public class DialogMoto extends AbstractDialog {
+public final class DialogMoto extends AbstractDialog {
 
     private JCheckBox chkCradle;
 

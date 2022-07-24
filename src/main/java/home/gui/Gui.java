@@ -1,13 +1,10 @@
 package home.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -31,12 +28,11 @@ import javax.swing.table.AbstractTableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import home.Main;
 import home.Settings;
+import home.Settings.Setting;
 import home.Storage;
-import home.db.DbInitializer;
-import home.db.dao.DaoSQLite;
 import home.gui.components.CustomJButton;
-import home.gui.components.CustomJFileChooser;
 import home.gui.components.CustomJFrame;
 import home.gui.components.CustomJPanel;
 import home.gui.components.CustomJPanel.PanelType;
@@ -44,10 +40,15 @@ import home.gui.components.CustomJTable;
 import home.gui.components.dialog.DialogCar;
 import home.gui.components.dialog.DialogMoto;
 import home.gui.components.dialog.DialogTruck;
+import home.gui.listener.CreateOrOpenActionListener;
+import home.gui.listener.SaveActionListener;
 import home.models.AbstractVehicle;
-import home.utils.Utils;
+import home.utils.LogUtils;
+import home.utils.ThreadUtils;
 
-public class Gui {
+public enum Gui {
+
+    INSTANCE;
 
     private static final Logger LOG = LoggerFactory.getLogger(Gui.class);
 
@@ -73,16 +74,6 @@ public class Gui {
 
     private JFrame frame;
 
-    private Gui() {
-    }
-
-    public static Gui getInstance() {
-        if (instance == null) {
-            instance = new Gui();
-        }
-        return instance;
-    }
-
     public void refreshTable() {
         tableModel.fireTableDataChanged();
     }
@@ -92,7 +83,7 @@ public class Gui {
     }
 
     public void buildGui() {
-        setStyle(Settings.STYLE);
+        setStyle(Settings.getStyle());
 
         createTable();
         createButtons();
@@ -111,9 +102,9 @@ public class Gui {
         } catch (Exception e) {
             try {
                 UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-                Settings.writeSettings(Settings.STYLE_SETTING_NAME,
+                Settings.writeSetting(Setting.STYLE,
                         ColorSchema.CROSSPLATFORM.name().toLowerCase(Locale.ROOT));
-                Utils.logAndShowError(LOG, frame,
+                LogUtils.logAndShowError(LOG, frame,
                         "Error while set the system color schema.\n"
                                 + ColorSchema.CROSSPLATFORM.getNameForGui()
                                 + " color schema will be used.\n"
@@ -121,7 +112,7 @@ public class Gui {
                         "System color schema error", e);
             } catch (Exception ex) {
                 JFrame.setDefaultLookAndFeelDecorated(true);
-                Utils.logAndShowError(LOG, frame,
+                LogUtils.logAndShowError(LOG, frame,
                         "Error while set Default color schema.\n" + ex.getMessage(),
                         "System color schema error", ex);
             }
@@ -129,7 +120,7 @@ public class Gui {
     }
 
     private void createTable() {
-        dbLabel = new JLabel(Settings.hasPathToDBFile() ? Settings.DB_FILE_PATH
+        dbLabel = new JLabel(Settings.hasPathToDBFile() ? Settings.getDbFilePath()
                 : IGuiConsts.CHOOSE_DB_FILE);
 
         table = CustomJTable.create();
@@ -140,7 +131,7 @@ public class Gui {
                 if (CLICK_COUNT == mouseEvent.getClickCount()) {
                     int selectedTableRow = table.getSelectedRow();
                     DialogCaller.showObjDialog(frame,
-                            Storage.getInstance().get(selectedTableRow), selectedTableRow);
+                            Storage.INSTANCE.get(selectedTableRow), selectedTableRow);
                 }
             }
         });
@@ -164,13 +155,13 @@ public class Gui {
 
         btnDel = CustomJButton.create(IGuiConsts.DEL);
         btnDel.addActionListener(actionEvent -> {
-            Utils.ruInThread("delete action", () -> {
-                List<AbstractVehicle> objsMarkedForDel = Storage.getInstance().getAll().stream()
+            ThreadUtils.runInThread(() -> {
+                Thread.currentThread().setName("-> delete action");
+                List<AbstractVehicle> objsMarkedForDel = Storage.INSTANCE.getAll().stream()
                         .filter(dataObj -> dataObj.isMarkedForDelete())
                         .collect(Collectors.toList());
                 if (!objsMarkedForDel.isEmpty()) {
-                    Storage.getInstance().deleteObjects(objsMarkedForDel);
-                    Gui.getInstance().refreshTable();
+                    DataActionInGui.delete(objsMarkedForDel);
                 }
             });
         });
@@ -189,30 +180,35 @@ public class Gui {
     }
 
     private void createMenu() {
-        var createOrOpenItime = new JMenuItem(IGuiConsts.CREATE_OR_OPEN);
-        createOrOpenItime.addActionListener(new CreateOrOpenActionListner(frame, dbLabel));
-        var saveItem = new JMenuItem(IGuiConsts.SAVE);
-        saveItem.addActionListener(new SaveActionListener(frame));
+        menuBar = new JMenuBar();
+
+        JMenuItem createOrOpenItime = createMenuItem(IGuiConsts.CREATE_OR_OPEN,
+                new CreateOrOpenActionListener(frame, dbLabel, LOG));
+        JMenuItem saveItem = createMenuItem(IGuiConsts.SAVE, new SaveActionListener(frame, dbLabel, false, LOG));
+        JMenuItem saveAsItem = createMenuItem(IGuiConsts.SAVE_AS, new SaveActionListener(frame, dbLabel, true, LOG));
         var fileMenu = new JMenu(IGuiConsts.FILE);
         fileMenu.add(createOrOpenItime);
         fileMenu.add(saveItem);
+        fileMenu.add(saveAsItem);
+        menuBar.add(fileMenu);
 
-        JMenu styleMenu = creatFilledStyleMenu();
+        menuBar.add(creatStyleMenu());
 
-        var aboutItem = new JMenuItem(IGuiConsts.ABOUT);
-        aboutItem.addActionListener(actionEvent -> JOptionPane.showMessageDialog(
-                frame, IGuiConsts.ABOUT_TEXT, IGuiConsts.ABOUT_TITLE,
-                JOptionPane.INFORMATION_MESSAGE));
+        JMenuItem aboutItem = createMenuItem(IGuiConsts.ABOUT, actionEvent -> JOptionPane.showMessageDialog(
+                frame, IGuiConsts.ABOUT_TEXT.formatted(Main.appVersion),
+                IGuiConsts.ABOUT_TITLE, JOptionPane.INFORMATION_MESSAGE));
         var helpMenu = new JMenu(IGuiConsts.HELP);
         helpMenu.add(aboutItem);
-
-        menuBar = new JMenuBar();
-        menuBar.add(fileMenu);
-        menuBar.add(styleMenu);
         menuBar.add(helpMenu);
     }
 
-    private JMenu creatFilledStyleMenu() {
+    private JMenuItem createMenuItem(String name, ActionListener listener) {
+        var menuItem = new JMenuItem(name);
+        menuItem.addActionListener(listener);
+        return menuItem;
+    }
+
+    private JMenu creatStyleMenu() {
         var styleMenu = new JMenu(IGuiConsts.STYLE);
         var checkBoxItems = new ArrayList<JCheckBoxMenuItem>();
         for (ColorSchema colorSchema : ColorSchema.values()) {
@@ -224,7 +220,7 @@ public class Gui {
     private JCheckBoxMenuItem createCheckBoxMenuItem(ColorSchema colorSchema,
             List<JCheckBoxMenuItem> checkBoxItems) {
         var checkBoxMenuItem = new JCheckBoxMenuItem(colorSchema.getNameForGui());
-        checkBoxMenuItem.setSelected(colorSchema.name().equalsIgnoreCase(Settings.STYLE));
+        checkBoxMenuItem.setSelected(colorSchema.name().equalsIgnoreCase(Settings.getStyle()));
         checkBoxItems.add(checkBoxMenuItem);
         checkBoxMenuItem.addActionListener(actionEvent -> styleSelectAction(actionEvent, checkBoxItems));
         return checkBoxMenuItem;
@@ -238,82 +234,21 @@ public class Gui {
             var selectedItem = (JCheckBoxMenuItem) actionEvent.getSource();
             selectedItem.setSelected(true);
 
-            Settings.writeSettings(Settings.STYLE_SETTING_NAME,
+            Settings.writeSetting(Setting.STYLE,
                     selectedItem.getText().toLowerCase(Locale.ROOT));
 
-            setStyle(Settings.STYLE);
+            setStyle(Settings.getStyle());
             SwingUtilities.updateComponentTreeUI(frame);
         } catch (Exception e) {
-            Utils.logAndShowError(LOG, frame, "Error while chose style", "Style error", e);
+            LogUtils.logAndShowError(LOG, frame, "Error while chose style", "Style error", e);
         }
     }
 
     private void createFrame() {
-        frame = CustomJFrame.create();
+        frame = CustomJFrame.create(Main.appName);
         frame.setJMenuBar(menuBar);
         frame.getContentPane().add(panelTable, BorderLayout.CENTER);
         frame.getContentPane().add(panelButton, BorderLayout.EAST);
         frame.setVisible(true);
-    }
-
-    private static final class CreateOrOpenActionListner implements ActionListener {
-
-        private final Component parent;
-        private final JLabel dbLabel;
-
-        public CreateOrOpenActionListner(Component parent, JLabel dbLabel) {
-            this.parent = parent;
-            this.dbLabel = dbLabel;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent event) {
-            Utils.ruInThread("create or open DB file", () -> {
-                try {
-                    CustomJFileChooser.create(parent, IGuiConsts.CREATE_OR_OPEN).showChooser();
-                    DbInitializer.createTableIfNotExists();
-                    Storage.getInstance().refresh(DaoSQLite.getInstance().readAll());
-                    dbLabel.setText(Settings.DB_FILE_PATH);
-                } catch (IOException e) {
-                    Utils.logAndShowError(LOG, parent, "Error while create/open DB file.",
-                            "Create/Open file error", e);
-                    System.exit(1);
-                } catch (SQLException e) {
-                    Utils.logAndShowError(LOG, parent, "Error while read selected DB file.\n"
-                            + e.getMessage(),
-                            "Read selected DB error", e);
-                    System.exit(1);
-                }
-            });
-        }
-    }
-
-    private static class SaveActionListener implements ActionListener {
-
-        private final Component parent;
-
-        public SaveActionListener(Component parent) {
-            this.parent = parent;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent event) {
-            Utils.ruInThread("save data to DB", () -> {
-                try {
-                    CustomJFileChooser.create(parent, IGuiConsts.SAVE).showChooser();
-                    DbInitializer.createTableIfNotExists();
-                    DaoSQLite.getInstance().saveAllChanges();
-                    Storage.getInstance().refresh(DaoSQLite.getInstance().readAll());
-                } catch (IOException e) {
-                    Utils.logAndShowError(LOG, parent, "Error while create/open DB file.",
-                            "create/open DB file", e);
-                    System.exit(1);
-                } catch (SQLException e) {
-                    Utils.logAndShowError(LOG, parent, "Error while read selected Db file.\n"
-                            + e.getMessage(), "read selected DB file", e);
-                    System.exit(1);
-                }
-            });
-        }
     }
 }

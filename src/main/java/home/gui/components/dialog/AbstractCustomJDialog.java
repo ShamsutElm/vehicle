@@ -1,4 +1,4 @@
-package home.gui.components;
+package home.gui.components.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -11,7 +11,7 @@ import javax.swing.JDialog;
 import javax.swing.KeyStroke;
 
 @SuppressWarnings("serial")
-public class CustomJDialog extends JDialog {
+abstract class AbstractCustomJDialog extends JDialog {
 
     private static final int GAP_BETWEEN_COMPONENTS = 2;
 
@@ -21,7 +21,7 @@ public class CustomJDialog extends JDialog {
     private final int widht;
     private final int height;
 
-    public CustomJDialog(String title, int widht, int height) {
+    public AbstractCustomJDialog(String title, int widht, int height) {
         this.title = title;
         this.widht = widht;
         this.height = height;

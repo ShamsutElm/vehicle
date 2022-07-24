@@ -24,12 +24,12 @@ import home.gui.IGuiConsts;
 /**
  * This is licensed under LGPL. License can be found here:
  * http://www.gnu.org/licenses/lgpl-3.0.txt
- *
+ * <p>
  * This is provided as is. If you have questions please direct them to
  * charlie.hubbard at gmail dot you know what.
  */
 @SuppressWarnings("serial")
-public class CustomJXDatePicker extends JXDatePicker {
+public final class CustomJXDatePicker extends JXDatePicker {
 
     private JSpinner timeSpinner;
     private JPanel timePanel;
