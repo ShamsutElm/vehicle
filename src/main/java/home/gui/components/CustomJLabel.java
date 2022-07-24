@@ -6,7 +6,7 @@ import java.awt.Font;
 import javax.swing.JLabel;
 
 @SuppressWarnings("serial")
-public class CustomJLabel extends JLabel {
+public final class CustomJLabel extends JLabel {
 
     private static final String FONT_NAME = "Courier";
     private static final int FONT_SIZE = 14;

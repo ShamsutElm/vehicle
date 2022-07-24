@@ -1,10 +1,8 @@
 package home.gui;
 
-import java.text.SimpleDateFormat;
-
 public interface IGuiConsts {
 
-    SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd | HH:mm:ss");
+    String DATE_FORMAT = "yyyy.MM.dd | HH:mm:ss";
 
     // Table columns names
     String TYPE = "Type";
@@ -29,17 +27,21 @@ public interface IGuiConsts {
     String FILE = "File";
     String CREATE_OR_OPEN = "Create/Open";
     String SAVE = "Save";
+    String SAVE_AS = "Save as...";
     String STYLE = "Style";
-    String DEFAULT = "Default";
-    String SYSTEM = "System";
     String HELP = "Help";
     String ABOUT = "About";
 
-    // Some default messages and titles in menu
+    //// Some default messages and titles in menu
+
+    // About dialog text
     String ABOUT_TITLE = "About";
-    String ABOUT_TEXT = "Some think have to be here, but i'm not sure";
+    String ABOUT_TEXT = "Test application.\nVersion: %s";
+
+    // Save dialog text
+    String SAVE_TITLE = "Save";
+    String SAVE_TEXT = "Save successfully";
 
     // DB Label
     String CHOOSE_DB_FILE = "Choose SQLite DB file via file -> Open/Create";
-
 }

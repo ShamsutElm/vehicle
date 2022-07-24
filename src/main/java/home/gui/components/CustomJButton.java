@@ -3,7 +3,7 @@ package home.gui.components;
 import javax.swing.JButton;
 
 @SuppressWarnings("serial")
-public class CustomJButton extends JButton {
+public final class CustomJButton extends JButton {
 
     private CustomJButton() {
     }
