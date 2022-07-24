@@ -1,10 +1,8 @@
 package home.gui;
 
-import java.text.SimpleDateFormat;
-
 public interface IGuiConsts {
 
-    SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd | HH:mm:ss");
+    String DATE_FORMAT = "yyyy.MM.dd | HH:mm:ss";
 
     // Table columns names
     String TYPE = "Type";

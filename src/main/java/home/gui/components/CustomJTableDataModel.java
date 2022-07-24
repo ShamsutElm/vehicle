@@ -1,12 +1,12 @@
 package home.gui.components;
 
-import java.sql.Date;
 import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
 import home.gui.IGuiConsts;
 import home.models.AbstractVehicle;
+import home.utils.Utils;
 
 @SuppressWarnings("serial")
 final class CustomJTableDataModel extends AbstractTableModel {
@@ -64,7 +64,7 @@ final class CustomJTableDataModel extends AbstractTableModel {
             case NUMBER_COL_IDX:
                 return dataObj.getNumber();
             case DATE_COL_IDX:
-                return IGuiConsts.DATE_FORMAT.format(new Date(dataObj.getDateTime()));
+                return Utils.getFormatedDate(dataObj.getDateTime());
             case DEL_MARK_COL_IDX:
                 return dataObj.isMarkedForDelete();
             default:
