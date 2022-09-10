@@ -1,4 +1,4 @@
-package home.db;
+package home.db.dao;
 
 public interface IDbConsts {
 

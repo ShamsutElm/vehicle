@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import home.IConsts;
 import home.Storage;
-import home.db.IDbConsts;
 import home.models.AbstractVehicle;
 import home.models.Car;
 import home.models.Motorcycle;
