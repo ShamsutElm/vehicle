@@ -11,7 +11,7 @@ import javax.swing.JDialog;
 import javax.swing.KeyStroke;
 
 @SuppressWarnings("serial")
-abstract class AbstractCustomJDialog extends JDialog {
+abstract sealed class AbstractCustomJDialog extends JDialog permits AbstractDialog {
 
     private static final int GAP_BETWEEN_COMPONENTS = 2;
 

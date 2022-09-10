@@ -22,7 +22,7 @@ import home.gui.components.CustomJXDatePicker;
 import home.models.AbstractVehicle;
 
 @SuppressWarnings("serial")
-public abstract class AbstractDialog extends AbstractCustomJDialog {
+public abstract sealed class AbstractDialog extends AbstractCustomJDialog permits AbstractDialogTrailer, DialogMoto {
 
     private static final int TEXT_FIELD_COLUMN_NUMBERS = 9;
 

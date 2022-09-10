@@ -2,7 +2,7 @@ package home.models;
 
 import java.util.Objects;
 
-public abstract class AbstractVehicle {
+public abstract sealed class AbstractVehicle permits AbstractVehicleWithTrailer, Motorcycle {
 
     private long id;
     private VehicleType type;

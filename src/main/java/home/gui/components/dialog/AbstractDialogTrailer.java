@@ -7,7 +7,7 @@ import home.models.AbstractVehicle;
 import home.models.AbstractVehicleWithTrailer;
 
 @SuppressWarnings("serial")
-abstract class AbstractDialogTrailer extends AbstractDialog {
+abstract sealed class AbstractDialogTrailer extends AbstractDialog permits DialogCar, DialogTruck {
 
     private JCheckBox chkHasTrailer;
 

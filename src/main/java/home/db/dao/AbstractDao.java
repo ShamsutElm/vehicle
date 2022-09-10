@@ -26,7 +26,7 @@ import home.models.Truck;
 import home.models.VehicleType;
 import home.utils.LogUtils;
 
-abstract class AbstractDao implements IDao {
+abstract sealed class AbstractDao implements IDao permits DaoSQLite {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractDao.class);
 
