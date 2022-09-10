@@ -23,6 +23,24 @@ public final class DialogCaller {
     private static final int OBJ_DIALOG_WIDTH = 450;
     private static final int OBJ_DIALOG_HEIGHT = 350;
 
+    @SuppressWarnings("unchecked")
+    public static <T extends AbstractDialog> void showObjDialog(JFrame frame,
+            AbstractVehicle dataObj, int tblRowOfSelectedDataObj) {
+        VehicleType objtType = dataObj.getType();
+
+        Class<T> dialogClass = switch (objtType) {
+            case CAR -> (Class<T>) DialogCar.class;
+            case TRUCK -> (Class<T>) DialogTruck.class;
+            case MOTORCYCLE -> (Class<T>) DialogMoto.class;
+        };
+
+        showObjDialog(frame, dialogClass, dataObj, tblRowOfSelectedDataObj);
+    }
+
+    public static <T extends AbstractDialog> void showObjDialog(JFrame frame, Class<T> dialogClass) {
+        showObjDialog(frame, dialogClass, null, Storage.NO_ROW_IS_SELECTED);
+    }
+
     public static <T extends AbstractDialog> void showObjDialog(JFrame frame, Class<T> dialogClass,
             AbstractVehicle dataObj, int tblRowOfSelectedDataObj) {
         try {
@@ -35,37 +53,6 @@ public final class DialogCaller {
             LogUtils.logAndShowError(LOG, frame, "Ошибка создания диалогового окна.\n"
                     + e.getMessage(), "Ошибка диалогового окна", e);
         }
-    }
-
-    public static <T extends AbstractDialog> void showObjDialog(JFrame frame, Class<T> dialogClass) {
-        showObjDialog(frame, dialogClass, null, Storage.NO_ROW_IS_SELECTED);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T extends AbstractDialog> void showObjDialog(JFrame frame,
-            AbstractVehicle dataObj, int tblRowOfSelectedDataObj) {
-        Class<T> dialogClass = null;
-        VehicleType objtType = dataObj.getType();
-        switch (objtType) {
-            case CAR:
-                dialogClass = (Class<T>) DialogCar.class;
-                break;
-
-            case TRUCK:
-                dialogClass = (Class<T>) DialogTruck.class;
-                break;
-
-            case MOTORCYCLE:
-                dialogClass = (Class<T>) DialogMoto.class;
-                break;
-
-            default:
-                LogUtils.logAndShowError(LOG, frame, "Нет диологового окна для [" + objtType + ']',
-                        "Ошибка типа диологового окна",
-                        new IllegalAccessException("Ошибка типа диологового окна"));
-                return;
-        }
-        showObjDialog(frame, dialogClass, dataObj, tblRowOfSelectedDataObj);
     }
 
     private DialogCaller() {

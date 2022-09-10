@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import home.IConsts;
 import home.Storage;
-import home.db.IDbConsts;
 import home.models.AbstractVehicle;
 import home.models.Car;
 import home.models.Motorcycle;
@@ -26,7 +25,7 @@ import home.models.Truck;
 import home.models.VehicleType;
 import home.utils.LogUtils;
 
-abstract class AbstractDao implements IDao {
+abstract sealed class AbstractDao implements IDao permits DaoSQLite {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractDao.class);
 
@@ -103,32 +102,25 @@ abstract class AbstractDao implements IDao {
             throw new SQLException("Wrong type: " + type);
         }
 
-        AbstractVehicle vehicle = null;
-        switch (vehicleType) {
-            case CAR:
-                vehicle = new Car();
-                var car = (Car) vehicle;
-                car.setTransportsPassengers(
-                        convertToBoolean(res.getInt(IDbConsts.IS_TRANSPORTS_PASSENGERS)));
-                car.setHasTrailer(
-                        convertToBoolean(res.getInt(IDbConsts.HAS_TRAILER)));
-                break;
-
-            case TRUCK:
-                vehicle = new Truck();
-                var truck = (Truck) vehicle;
-                truck.setTransportsCargo(
-                        convertToBoolean(res.getInt(IDbConsts.IS_TRANSPORTS_CARGO)));
-                truck.setHasTrailer(
-                        convertToBoolean(res.getInt(IDbConsts.HAS_TRAILER)));
-                break;
-
-            case MOTORCYCLE:
-                vehicle = new Motorcycle();
-                ((Motorcycle) vehicle).setHasCradle(
-                        convertToBoolean(res.getInt(IDbConsts.HAS_CRADLE)));
-                break;
-        }
+        AbstractVehicle vehicle = switch (vehicleType) {
+            case CAR -> {
+                var car = new Car();
+                car.setTransportsPassengers(convertToBoolean(res.getInt(IDbConsts.IS_TRANSPORTS_PASSENGERS)));
+                car.setHasTrailer(convertToBoolean(res.getInt(IDbConsts.HAS_TRAILER)));
+                yield car;
+            }
+            case TRUCK -> {
+                var truck = new Truck();
+                truck.setTransportsCargo(convertToBoolean(res.getInt(IDbConsts.IS_TRANSPORTS_CARGO)));
+                truck.setHasTrailer(convertToBoolean(res.getInt(IDbConsts.HAS_TRAILER)));
+                yield truck;
+            }
+            case MOTORCYCLE -> {
+                var motorcycle = new Motorcycle();
+                motorcycle.setHasCradle(convertToBoolean(res.getInt(IDbConsts.HAS_CRADLE)));
+                yield motorcycle;
+            }
+        };
 
         vehicle.setId(res.getLong(IDbConsts.ID));
         vehicle.setColor(res.getString(IDbConsts.COLOR));
@@ -139,14 +131,11 @@ abstract class AbstractDao implements IDao {
     }
 
     private boolean convertToBoolean(int intBoolean) throws SQLException {
-        switch (intBoolean) {
-            case 0:
-                return false;
-            case 1:
-                return true;
-            default:
-                throw new SQLException("Wrong logic value: " + intBoolean);
-        }
+        return switch (intBoolean) {
+            case 0 -> false;
+            case 1 -> true;
+            default -> throw new SQLException("Wrong logic value: " + intBoolean);
+        };
     }
 
     @Override

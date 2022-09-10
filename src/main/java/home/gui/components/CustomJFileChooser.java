@@ -83,11 +83,7 @@ public final class CustomJFileChooser extends JFileChooser {
             //// [Create/Open] menu, u don't need to select database file,
             //// if it already opened.
             if (MAX_TRY_COUNT_BEFORE_CREATE_DEFAULT_FILE == counterBeforeCreateDefaultFile) {
-                String defaultFilePath = getCurrentDirectory().getAbsolutePath() + File.separator
-                        + DEFAULT_PREFIX + System.currentTimeMillis() + DEFAULT_EXTENSION;
-                JOptionPane.showMessageDialog(parent, String.format(WILL_CREATE_DEFAULT_STORAGE, defaultFilePath),
-                        DEFAULT_STORAGE, JOptionPane.INFORMATION_MESSAGE);
-                DbInitializer.createDBFileIfNotExists(new File(defaultFilePath));
+                generateDefaultDbFile(parent);
                 return;
             }
             counterBeforeCreateDefaultFile++;
@@ -96,7 +92,6 @@ public final class CustomJFileChooser extends JFileChooser {
             showChooser(parent, operation);
         }
     }
-
 
     private File addExtensionToFileIfNotExist(File file) throws IOException {
         if (Arrays.stream(EXTENSIONS).anyMatch(extension -> file.getName().endsWith('.' + extension))) {
@@ -109,5 +104,13 @@ public final class CustomJFileChooser extends JFileChooser {
         if (file.exists()) {
             throw new SaveAsToSameFileException("File " + file.getAbsolutePath() + " already exists.");
         }
+    }
+
+    private void generateDefaultDbFile(Component parent) throws IOException {
+        String defaultFilePath = getCurrentDirectory().getAbsolutePath() + File.separator
+                + DEFAULT_PREFIX + System.currentTimeMillis() + DEFAULT_EXTENSION;
+        JOptionPane.showMessageDialog(parent, String.format(WILL_CREATE_DEFAULT_STORAGE, defaultFilePath),
+                DEFAULT_STORAGE, JOptionPane.INFORMATION_MESSAGE);
+        DbInitializer.createDBFileIfNotExists(new File(defaultFilePath));
     }
 }
