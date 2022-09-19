@@ -33,15 +33,17 @@ abstract sealed class AbstractDao implements IDao permits DaoSQLite {
 
     private static final String SELECT_ONE = "SELECT * FROM vehicle WHERE id=?;";
 
-    private static final String INSERT = "INSERT INTO vehicle"
-            + " ('type','color','number','date_time','is_transports_cargo',"
-            + "'is_transports_passengers','has_trailer','has_cradle')"
-            + " VALUES (?,?,?,?,?,?,?,?);";
+    private static final String INSERT = """
+            INSERT INTO vehicle
+            ('type','color','number','date_time','is_transports_cargo',
+            'is_transports_passengers','has_trailer','has_cradle')
+            VALUES (?,?,?,?,?,?,?,?);""";
 
-    private static final String UPDATE = "UPDATE vehicle SET type = ?,"
-            + " color = ?, number = ?, date_time = ?,"
-            + " is_transports_cargo = ?, is_transports_passengers = ?,"
-            + " has_trailer = ?, has_cradle = ? WHERE id = ?;";
+    private static final String UPDATE = """
+            UPDATE vehicle SET 
+            type = ?, color = ?, number = ?, date_time = ?,
+            is_transports_cargo = ?, is_transports_passengers = ?,
+            has_trailer = ?, has_cradle = ? WHERE id = ?;""";
 
     private static final String DELETE = "DELETE FROM vehicle WHERE id IN (%s);";
 
