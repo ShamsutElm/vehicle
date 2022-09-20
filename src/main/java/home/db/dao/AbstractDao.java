@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import home.IConsts;
 import home.Storage;
-import home.db.IDbConsts;
 import home.models.AbstractVehicle;
 import home.models.Car;
 import home.models.Motorcycle;
@@ -26,7 +25,7 @@ import home.models.Truck;
 import home.models.VehicleType;
 import home.utils.LogUtils;
 
-abstract class AbstractDao implements IDao {
+abstract sealed class AbstractDao implements IDao permits DaoSQLite {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractDao.class);
 
@@ -34,15 +33,17 @@ abstract class AbstractDao implements IDao {
 
     private static final String SELECT_ONE = "SELECT * FROM vehicle WHERE id=?;";
 
-    private static final String INSERT = "INSERT INTO vehicle"
-            + " ('type','color','number','date_time','is_transports_cargo',"
-            + "'is_transports_passengers','has_trailer','has_cradle')"
-            + " VALUES (?,?,?,?,?,?,?,?);";
+    private static final String INSERT = """
+            INSERT INTO vehicle
+            ('type','color','number','date_time','is_transports_cargo',
+            'is_transports_passengers','has_trailer','has_cradle')
+            VALUES (?,?,?,?,?,?,?,?);""";
 
-    private static final String UPDATE = "UPDATE vehicle SET type = ?,"
-            + " color = ?, number = ?, date_time = ?,"
-            + " is_transports_cargo = ?, is_transports_passengers = ?,"
-            + " has_trailer = ?, has_cradle = ? WHERE id = ?;";
+    private static final String UPDATE = """
+            UPDATE vehicle SET 
+            type = ?, color = ?, number = ?, date_time = ?,
+            is_transports_cargo = ?, is_transports_passengers = ?,
+            has_trailer = ?, has_cradle = ? WHERE id = ?;""";
 
     private static final String DELETE = "DELETE FROM vehicle WHERE id IN (%s);";
 
@@ -103,32 +104,25 @@ abstract class AbstractDao implements IDao {
             throw new SQLException("Wrong type: " + type);
         }
 
-        AbstractVehicle vehicle = null;
-        switch (vehicleType) {
-            case CAR:
-                vehicle = new Car();
-                var car = (Car) vehicle;
-                car.setTransportsPassengers(
-                        convertToBoolean(res.getInt(IDbConsts.IS_TRANSPORTS_PASSENGERS)));
-                car.setHasTrailer(
-                        convertToBoolean(res.getInt(IDbConsts.HAS_TRAILER)));
-                break;
-
-            case TRUCK:
-                vehicle = new Truck();
-                var truck = (Truck) vehicle;
-                truck.setTransportsCargo(
-                        convertToBoolean(res.getInt(IDbConsts.IS_TRANSPORTS_CARGO)));
-                truck.setHasTrailer(
-                        convertToBoolean(res.getInt(IDbConsts.HAS_TRAILER)));
-                break;
-
-            case MOTORCYCLE:
-                vehicle = new Motorcycle();
-                ((Motorcycle) vehicle).setHasCradle(
-                        convertToBoolean(res.getInt(IDbConsts.HAS_CRADLE)));
-                break;
-        }
+        AbstractVehicle vehicle = switch (vehicleType) {
+            case CAR -> {
+                var car = new Car();
+                car.setTransportsPassengers(convertToBoolean(res.getInt(IDbConsts.IS_TRANSPORTS_PASSENGERS)));
+                car.setHasTrailer(convertToBoolean(res.getInt(IDbConsts.HAS_TRAILER)));
+                yield car;
+            }
+            case TRUCK -> {
+                var truck = new Truck();
+                truck.setTransportsCargo(convertToBoolean(res.getInt(IDbConsts.IS_TRANSPORTS_CARGO)));
+                truck.setHasTrailer(convertToBoolean(res.getInt(IDbConsts.HAS_TRAILER)));
+                yield truck;
+            }
+            case MOTORCYCLE -> {
+                var motorcycle = new Motorcycle();
+                motorcycle.setHasCradle(convertToBoolean(res.getInt(IDbConsts.HAS_CRADLE)));
+                yield motorcycle;
+            }
+        };
 
         vehicle.setId(res.getLong(IDbConsts.ID));
         vehicle.setColor(res.getString(IDbConsts.COLOR));
@@ -139,14 +133,11 @@ abstract class AbstractDao implements IDao {
     }
 
     private boolean convertToBoolean(int intBoolean) throws SQLException {
-        switch (intBoolean) {
-            case 0:
-                return false;
-            case 1:
-                return true;
-            default:
-                throw new SQLException("Wrong logic value: " + intBoolean);
-        }
+        return switch (intBoolean) {
+            case 0 -> false;
+            case 1 -> true;
+            default -> throw new SQLException("Wrong logic value: " + intBoolean);
+        };
     }
 
     @Override
@@ -243,7 +234,7 @@ abstract class AbstractDao implements IDao {
         }
     }
 
-    private void checkBatchExecution(int[] batchResults, String errorMsg, Logger log) throws SQLException {
+    void checkBatchExecution(int[] batchResults, String errorMsg, Logger log) throws SQLException {
         if (batchResults == null) {
             log.warn("Batch execution result is null.\nCheck!\nMaybe " + errorMsg);
             return;
@@ -257,14 +248,14 @@ abstract class AbstractDao implements IDao {
 
             var msg = new StringBuilder();
             msg.append("Batch execution error:\n").append(errorMsg)
-                    .append("\n").append("when executing the batch, ");
+                    .append("\n").append("When executing the batch, ");
 
             if (Statement.EXECUTE_FAILED == batchResalt) {
                 msg.append("result code 'EXECUTE_FAILED' was received.");
                 throw LogUtils.logAndCreateSqlException(msg.toString(), log);
             }
 
-            msg.append("Unknown result code ").append(batchResalt).append(" was received.");
+            msg.append("unknown result code '").append(batchResalt).append("' was received.");
             throw LogUtils.logAndCreateSqlException(msg.toString(), log);
         }
     }

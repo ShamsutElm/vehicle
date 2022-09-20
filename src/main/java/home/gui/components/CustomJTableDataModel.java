@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
+import home.IConsts;
 import home.gui.IGuiConsts;
 import home.models.AbstractVehicle;
 import home.utils.Utils;
@@ -37,39 +38,31 @@ final class CustomJTableDataModel extends AbstractTableModel {
 
     @Override
     public String getColumnName(int column) {
-        switch (column) {
-            case TYPE_COL_IDX:
-                return IGuiConsts.TYPE;
-            case COLOR_COL_IDX:
-                return IGuiConsts.COLOR;
-            case NUMBER_COL_IDX:
-                return IGuiConsts.NUMBER;
-            case DATE_COL_IDX:
-                return IGuiConsts.DATE;
-            case DEL_MARK_COL_IDX:
-                return IGuiConsts.DELETION_MARK;
-            default:
-                return "";
-        }
+        String columnName = switch (column) {
+            case TYPE_COL_IDX -> IGuiConsts.TYPE;
+            case COLOR_COL_IDX -> IGuiConsts.COLOR;
+            case NUMBER_COL_IDX -> IGuiConsts.NUMBER;
+            case DATE_COL_IDX -> IGuiConsts.DATE;
+            case DEL_MARK_COL_IDX -> IGuiConsts.DELETION_MARK;
+            default -> IConsts.EMPTY_STRING;
+        };
+        return columnName;
     }
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         AbstractVehicle dataObj = dataObjs.get(rowIndex);
-        switch (columnIndex) {
-            case TYPE_COL_IDX:
-                return dataObj.getType();
-            case COLOR_COL_IDX:
-                return dataObj.getColor();
-            case NUMBER_COL_IDX:
-                return dataObj.getNumber();
-            case DATE_COL_IDX:
-                return Utils.getFormatedDate(dataObj.getDateTime());
-            case DEL_MARK_COL_IDX:
-                return dataObj.isMarkedForDelete();
-            default:
-                return "";
-        }
+
+        Object cellValue = switch (columnIndex) {
+            case TYPE_COL_IDX -> dataObj.getType();
+            case COLOR_COL_IDX -> dataObj.getColor();
+            case NUMBER_COL_IDX -> dataObj.getNumber();
+            case DATE_COL_IDX -> Utils.getFormatedDate(dataObj.getDateTime());
+            case DEL_MARK_COL_IDX -> dataObj.isMarkedForDelete();
+            default -> IConsts.EMPTY_STRING;
+        };
+
+        return cellValue;
     }
 
     @Override

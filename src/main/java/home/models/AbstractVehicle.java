@@ -1,8 +1,12 @@
 package home.models;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public abstract class AbstractVehicle {
+public abstract sealed class AbstractVehicle implements Serializable
+        permits AbstractVehicleWithTrailer, Motorcycle {
+
+    private static final long serialVersionUID = 6042928580773544419L;
 
     private long id;
     private VehicleType type;

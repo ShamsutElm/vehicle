@@ -28,6 +28,8 @@ public interface IGuiConsts {
     String CREATE_OR_OPEN = "Create/Open";
     String SAVE = "Save";
     String SAVE_AS = "Save as...";
+    String IMPORT_FROM = "Import from...";
+    String EXPORT_TO = "Export to...";
     String STYLE = "Style";
     String HELP = "Help";
     String ABOUT = "About";

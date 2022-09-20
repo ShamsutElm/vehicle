@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<vehicles>
+    <vehicle type="CAR">
+        <color>red</color>
+        <number>1</number>
+        <date>2022.09.20 | 16:15:39</date>
+        <has_trailer>true</has_trailer>
+        <is_transpotrs_passengers>false</is_transpotrs_passengers>
+    </vehicle>
+    <vehicle type="TRUCK">
+        <color>black</color>
+        <number>2</number>
+        <date>2022.09.20 | 16:15:51</date>
+        <has_trailer>false</has_trailer>
+        <is_transtorts_cargo>true</is_transtorts_cargo>
+    </vehicle>
+    <vehicle type="MOTORCYCLE">
+        <color>white</color>
+        <number>3</number>
+        <date>2022.09.20 | 16:15:59</date>
+        <has_cradle>false</has_cradle>
+    </vehicle>
+</vehicles>

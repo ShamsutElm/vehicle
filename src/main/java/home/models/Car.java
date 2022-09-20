@@ -4,6 +4,8 @@ import java.util.Objects;
 
 public final class Car extends AbstractVehicleWithTrailer {
 
+    private static final long serialVersionUID = 3025869662456388766L;
+
     private boolean isTransportsPassengers;
 
     @Override

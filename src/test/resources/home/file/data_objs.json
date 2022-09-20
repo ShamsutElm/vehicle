@@ -1,0 +1,23 @@
+{
+  "vehicles" : [ {
+    "type" : "car",
+    "color" : "red",
+    "number" : "1",
+    "date" : "2022.09.20 | 16:15:39",
+    "has_trailer" : "true",
+    "is_transpotrs_passengers" : "false"
+  }, {
+    "type" : "truck",
+    "color" : "black",
+    "number" : "2",
+    "date" : "2022.09.20 | 16:15:51",
+    "has_trailer" : "false",
+    "is_transtorts_cargo" : "true"
+  }, {
+    "type" : "motorcycle",
+    "color" : "white",
+    "number" : "3",
+    "date" : "2022.09.20 | 16:15:59",
+    "has_cradle" : "false"
+  } ]
+}
