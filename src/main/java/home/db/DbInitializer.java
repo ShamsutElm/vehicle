@@ -14,16 +14,17 @@ public final class DbInitializer {
 
     private static final Logger LOG = LoggerFactory.getLogger(DbInitializer.class);
 
-    private static final String CREATE_TBL_QUERY = "CREATE TABLE if NOT EXISTS vehicle ("
-            + " 'id' integer PRIMARY KEY AUTOINCREMENT,"
-            + " 'type' text,"
-            + " 'color' text,"
-            + " 'number' text,"
-            + " 'is_transports_cargo' integer,"
-            + " 'is_transports_passengers' integer,"
-            + " 'has_trailer' integer,"
-            + " 'has_cradle' integer,"
-            + " 'date_time' integer);";
+    private static final String CREATE_TBL_QUERY = """
+            CREATE TABLE if NOT EXISTS vehicle (
+                'id' integer PRIMARY KEY AUTOINCREMENT,
+                'type' text,
+                'color' text,
+                'number' text,
+                'is_transports_cargo' integer,
+                'is_transports_passengers' integer,
+                'has_trailer' integer,
+                'has_cradle' integer,
+                'date_time' integer);""";
 
     public static void createDBFileIfNotExists(File file) throws IOException {
         try {

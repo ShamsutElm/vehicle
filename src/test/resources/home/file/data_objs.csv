@@ -1,0 +1,4 @@
+type,color,number,date,has_trailer,is_transpotrs_passengers,is_transtorts_cargo,has_cradle
+car,red,1,2022.09.20 | 16:15:39,true,false,false,false
+truck,black,2,2022.09.20 | 16:15:51,false,false,true,false
+motorcycle,white,3,2022.09.20 | 16:15:59,false,false,false,false

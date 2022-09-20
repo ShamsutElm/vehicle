@@ -4,6 +4,8 @@ import java.util.Objects;
 
 public abstract sealed class AbstractVehicleWithTrailer extends AbstractVehicle permits Car, Truck {
 
+    private static final long serialVersionUID = 3684345766913660872L;
+
     private boolean hasTrailer;
 
     public boolean hasTrailer() {
