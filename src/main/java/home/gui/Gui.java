@@ -20,6 +20,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -37,10 +38,12 @@ import home.gui.components.CustomJFrame;
 import home.gui.components.CustomJPanel;
 import home.gui.components.CustomJPanel.PanelType;
 import home.gui.components.CustomJTable;
+import home.gui.components.CustomJfileChooserImpExp.DataFormat;
 import home.gui.components.dialog.DialogCar;
 import home.gui.components.dialog.DialogMoto;
 import home.gui.components.dialog.DialogTruck;
 import home.gui.listener.CreateOrOpenActionListener;
+import home.gui.listener.ExportImportActionListener;
 import home.gui.listener.SaveActionListener;
 import home.models.AbstractVehicle;
 import home.utils.LogUtils;
@@ -186,10 +189,16 @@ public enum Gui {
                 new CreateOrOpenActionListener(frame, dbLabel, LOG));
         JMenuItem saveItem = createMenuItem(IGuiConsts.SAVE, new SaveActionListener(frame, dbLabel, false, LOG));
         JMenuItem saveAsItem = createMenuItem(IGuiConsts.SAVE_AS, new SaveActionListener(frame, dbLabel, true, LOG));
+        JMenu importItem = createImportExportDropdownMenu(true);
+        JMenu exportItem = createImportExportDropdownMenu(false);
         var fileMenu = new JMenu(IGuiConsts.FILE);
         fileMenu.add(createOrOpenItime);
+        fileMenu.add(new JSeparator());
         fileMenu.add(saveItem);
         fileMenu.add(saveAsItem);
+        fileMenu.add(new JSeparator());
+        fileMenu.add(importItem);
+        fileMenu.add(exportItem);
         menuBar.add(fileMenu);
 
         menuBar.add(creatStyleMenu());
@@ -206,6 +215,15 @@ public enum Gui {
         var menuItem = new JMenuItem(name);
         menuItem.addActionListener(listener);
         return menuItem;
+    }
+
+    private JMenu createImportExportDropdownMenu(boolean isImport) {
+        var dropdownMenu = new JMenu(isImport ? IGuiConsts.IMPORT_FROM : IGuiConsts.EXPORT_TO);
+        for (DataFormat dataFormat : DataFormat.values()) {
+            dropdownMenu.add(createMenuItem(dataFormat.getExtension(),
+                    new ExportImportActionListener(dataFormat, isImport, frame, LOG)));
+        }
+        return dropdownMenu;
     }
 
     private JMenu creatStyleMenu() {

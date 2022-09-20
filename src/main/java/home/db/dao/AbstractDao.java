@@ -234,7 +234,7 @@ abstract sealed class AbstractDao implements IDao permits DaoSQLite {
         }
     }
 
-    private void checkBatchExecution(int[] batchResults, String errorMsg, Logger log) throws SQLException {
+    void checkBatchExecution(int[] batchResults, String errorMsg, Logger log) throws SQLException {
         if (batchResults == null) {
             log.warn("Batch execution result is null.\nCheck!\nMaybe " + errorMsg);
             return;
@@ -248,14 +248,14 @@ abstract sealed class AbstractDao implements IDao permits DaoSQLite {
 
             var msg = new StringBuilder();
             msg.append("Batch execution error:\n").append(errorMsg)
-                    .append("\n").append("when executing the batch, ");
+                    .append("\n").append("When executing the batch, ");
 
             if (Statement.EXECUTE_FAILED == batchResalt) {
                 msg.append("result code 'EXECUTE_FAILED' was received.");
                 throw LogUtils.logAndCreateSqlException(msg.toString(), log);
             }
 
-            msg.append("Unknown result code ").append(batchResalt).append(" was received.");
+            msg.append("unknown result code '").append(batchResalt).append("' was received.");
             throw LogUtils.logAndCreateSqlException(msg.toString(), log);
         }
     }

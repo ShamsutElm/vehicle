@@ -4,6 +4,8 @@ import java.util.Objects;
 
 public final class Motorcycle extends AbstractVehicle {
 
+    private static final long serialVersionUID = -1230520246115051970L;
+
     private boolean hasCradle;
 
     @Override
